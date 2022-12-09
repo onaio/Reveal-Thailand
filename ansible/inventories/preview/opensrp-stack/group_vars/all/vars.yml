@@ -137,3 +137,7 @@ opensrp_rabbitmq_password: "{{ vault_opensrp_rabbitmq_password }}"
 
 openmrs_site_name: ""
 openmrs_install_name: ""
+
+reveal_ssl_dir: "../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/files/ssl"
+reveal_ssl_cert_file: "star.ddc-malaria.org.crt"
+reveal_ssl_key_file: "star.ddc-malaria.org.key"
