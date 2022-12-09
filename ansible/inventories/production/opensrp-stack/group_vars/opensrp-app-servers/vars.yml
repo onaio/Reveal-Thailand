@@ -44,7 +44,7 @@ opensrp_postgres_superuser_password: "{{ vault_reveal_postgres_superuser_passwor
 opensrp_certs_from_letsencrypt: true
 opensrp_certbot_mail_address: "techops+{{ opensrp_site_name }}@ona.io"
 opensrp_site_name: "servermhealth.ddc.moph.go.th"
-opensrp_postgres_ca_bundle_content: "{{ lookup('file', 'ansible/inventories/production/opensrp-stack/files/tls/root.crt') }}"
+opensrp_postgres_ca_bundle_content: "{{ lookup('file', '../Reveal-Thailand/ansible/inventories/production/opensrp-stack/files/tls/root.crt') }}"
 pensrp_http_site: "{{ opensrp_site_name }}-http"
 pensrp_https_site: "{{ opensrp_site_name }}-https"
 opensrp_nginx_enabled_sites:

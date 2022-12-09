@@ -26,8 +26,8 @@ postgresql_backup_gpg_key_id: "{{ reveal_backup_gpg_key_id }}"
 postgresql_backup_gpg_pass: "{{ reveal_backup_gpg_key_password }}"
 postgresql_enable_ssl: true
 postgresql_ssl_domain: "{{ reveal_postgres_host }}"
-postgresql_ssl_ca_key: "{{ lookup('file', 'ansible/inventories/production/opensrp-stack/files/tls/root.key') }}"
-postgresql_ssl_ca_cert: "{{ lookup('file', 'ansible/inventories/production/opensrp-stack/files/tls/root.crt') }}"
+postgresql_ssl_ca_key: "{{ lookup('file', '../Reveal-Thailand/ansible/inventories/production/opensrp-stack/files/tls/root.key') }}"
+postgresql_ssl_ca_cert: "{{ lookup('file', '../Reveal-Thailand/ansible/inventories/production/opensrp-stack/files/tls/root.crt') }}"
 postgresql_listen_addresses:
   - "localhost"
   - "{{ reveal_database_server }}"
