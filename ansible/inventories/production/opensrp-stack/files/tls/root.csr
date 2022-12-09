@@ -1,0 +1,61 @@
+Certificate Request:
+    Data:
+        Version: 1 (0x0)
+        Subject: CN = db.reveal-th.smartregister.org
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:c2:68:de:b0:fe:c4:98:df:b6:46:b0:f3:bc:b4:
+                    9a:6c:8a:83:67:a1:74:90:4e:cf:50:c2:aa:bc:02:
+                    b1:32:d3:5a:3f:a0:8b:d5:b7:73:a2:12:0a:dc:f0:
+                    19:fe:8d:76:eb:3f:8c:ea:ca:63:20:29:e3:94:ba:
+                    70:30:2b:66:00:86:f9:2c:86:91:26:27:7f:8e:87:
+                    68:03:ce:ae:89:e6:24:a2:73:96:76:a2:9f:ea:a2:
+                    fb:9e:31:fd:14:38:b7:d6:5e:2d:03:47:a3:85:11:
+                    93:6e:0b:22:a8:df:97:49:46:00:51:e1:3d:c5:5f:
+                    e5:b8:c8:69:e6:bc:cd:6c:72:b5:29:a7:62:a1:f4:
+                    1d:31:f2:a4:f4:aa:da:8b:7a:45:57:56:c4:ae:62:
+                    21:1f:8a:ee:2b:61:69:4a:c3:5f:64:02:25:c5:f3:
+                    53:2b:09:e0:6d:ba:37:8d:e6:09:85:29:f1:92:f1:
+                    05:c6:d9:49:3e:8a:44:25:43:6a:e5:c4:02:d8:23:
+                    c5:d8:fa:27:d9:68:9f:61:f1:ec:07:48:03:33:ad:
+                    2a:eb:b5:00:ef:05:52:e0:e5:95:b3:26:82:b7:a6:
+                    81:b7:a8:62:1f:1f:b3:75:a8:ba:4f:df:f3:b9:c7:
+                    b0:28:49:6c:5c:10:cc:9b:f2:cd:8a:85:7e:1e:21:
+                    47:79
+                Exponent: 65537 (0x10001)
+        Attributes:
+            a0:00
+    Signature Algorithm: sha256WithRSAEncryption
+         a0:ed:35:19:59:d4:f6:57:d2:07:31:24:50:6c:b5:64:ec:0c:
+         a8:d5:22:c6:0b:1e:5b:7e:4c:83:74:83:d6:8e:6e:2a:71:f6:
+         b7:be:d4:12:dd:be:eb:52:6d:83:b5:67:07:e7:80:d2:f8:bd:
+         62:81:52:c0:9a:b9:f8:18:11:c2:87:2b:15:f6:f5:05:da:00:
+         a8:6f:69:86:03:04:28:09:d8:fe:ef:fb:ad:4d:71:4b:8c:b4:
+         11:03:5d:8f:44:b9:58:27:96:f5:70:26:b5:5a:2d:e6:a8:63:
+         b4:2c:4d:66:e1:b8:52:95:e5:9b:40:6f:20:d9:c6:6f:b9:cf:
+         20:29:f1:69:92:98:16:fe:a9:ca:82:d6:d1:9f:0d:53:89:ef:
+         d9:4e:45:af:7b:a8:c4:09:ff:ba:ad:7f:ea:3a:74:e1:a6:36:
+         dd:a3:d5:bf:96:31:35:df:88:c8:f1:9c:b4:85:9c:5a:37:c0:
+         98:fb:92:cc:03:43:8a:e7:10:be:c8:4d:ce:4f:ab:fa:06:bd:
+         94:57:dc:12:fa:5e:53:21:cf:12:89:bf:80:8d:a6:93:c1:fb:
+         dc:7e:03:c9:ad:ab:cf:c0:c8:84:8e:ab:1f:29:13:48:8a:2d:
+         d9:6b:be:83:43:67:5e:e4:8e:ed:82:b9:43:78:dd:8d:42:f0:
+         4f:48:c9:4e
+-----BEGIN CERTIFICATE REQUEST-----
+MIICbjCCAVYCAQAwKTEnMCUGA1UEAwweZGIucmV2ZWFsLXRoLnNtYXJ0cmVnaXN0
+ZXIub3JnMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwmjesP7EmN+2
+RrDzvLSabIqDZ6F0kE7PUMKqvAKxMtNaP6CL1bdzohIK3PAZ/o126z+M6spjICnj
+lLpwMCtmAIb5LIaRJid/jodoA86uieYkonOWdqKf6qL7njH9FDi31l4tA0ejhRGT
+bgsiqN+XSUYAUeE9xV/luMhp5rzNbHK1KadiofQdMfKk9Krai3pFV1bErmIhH4ru
+K2FpSsNfZAIlxfNTKwngbbo3jeYJhSnxkvEFxtlJPopEJUNq5cQC2CPF2Pon2Wif
+YfHsB0gDM60q67UA7wVS4OWVsyaCt6aBt6hiHx+zdai6T9/zucewKElsXBDMm/LN
+ioV+HiFHeQIDAQABoAAwDQYJKoZIhvcNAQELBQADggEBAKDtNRlZ1PZX0gcxJFBs
+tWTsDKjVIsYLHlt+TIN0g9aObipx9re+1BLdvutSbYO1ZwfngNL4vWKBUsCaufgY
+EcKHKxX29QXaAKhvaYYDBCgJ2P7v+61NcUuMtBEDXY9EuVgnlvVwJrVaLeaoY7Qs
+TWbhuFKV5ZtAbyDZxm+5zyAp8WmSmBb+qcqC1tGfDVOJ79lORa97qMQJ/7qtf+o6
+dOGmNt2j1b+WMTXfiMjxnLSFnFo3wJj7kswDQ4rnEL7ITc5Pq/oGvZRX3BL6XlMh
+zxKJv4CNppPB+9x+A8mtq8/AyISOqx8pE0iKLdlrvoNDZ17kju2CuUN43Y1C8E9I
+yU4=
+-----END CERTIFICATE REQUEST-----

@@ -1,0 +1,91 @@
+---
+ansible_user: mhealth
+
+# generic
+reveal_migrations_version: "v5.4.0"
+reveal_migrations_db_name: reveal1_preview
+
+# slack
+slack_deployed_app_name: "Reveal Thailand Preview Database Migrations"
+slack_deployed_app_version: "{{ reveal_migrations_version }}"
+slack_deployed_domain: "supersetmhealth.ddc.moph.go.th"
+
+# sqitch migrations
+sqitch_registry: "sqitch_thailand_preview"
+reveal_migrations_home: "{{ sqitch_migrations_home }}/reveal-preview"
+reveal_migration_schema: "public"
+sqitch_migrations_system_dependencies:
+  - git
+sqitch_migrations_repositories:
+  - url: https://github.com/OpenSRP/opensrp-reveal-datawarehouse.git
+    destination: "{{ reveal_migrations_home }}"
+    version: "{{ reveal_migrations_version }}"
+sqitch_migrations_db_connections:
+  preview_db_admin:
+    user: "{{ vault_db_admin_username }}"
+    password: "{{ vault_db_admin_password }}"
+    host: "{{ vault_db_host }}"
+    port: 5432
+    database: "{{ reveal_migrations_db_name }}"
+  preview_db_user:
+    user: "{{ vault_db_user_username }}"
+    password: "{{ vault_db_user_password }}"
+    host: "{{ vault_db_host }}"
+    port: 5432
+    database: "{{ reveal_migrations_db_name }}"
+sqitch_migrations_sqitch_plans:
+  preview_db_admin:
+    - directory: "{{ reveal_migrations_home }}/0-setup"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+  preview_db_user:
+    - directory: "{{ reveal_migrations_home }}/1-utils"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+    - directory: "{{ reveal_migrations_home }}/2-common-migrations/1-transaction-tables"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+    - directory: "{{ reveal_migrations_home }}/2-common-migrations/2-raw-tables"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+    - directory: "{{ reveal_migrations_home }}/3-reveal/migrations/1-raw_tables"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+    - directory: "{{ reveal_migrations_home }}/3-reveal/migrations/2-transaction_tables"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+    - directory: "{{ reveal_migrations_home }}/3-reveal/migrations/3-views"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+    - directory: "{{ reveal_migrations_home }}/3-reveal/migrations/4-FI/1-Thailand-2019"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+    - directory: "{{ reveal_migrations_home }}/3-reveal/migrations/7-thai-only"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+    - directory: "{{ reveal_migrations_home }}/3-reveal/migrations/99-monitoring"
+      registry: "{{ sqitch_registry  }}"
+      extra_args: --verify --set schema={{ reveal_migration_schema }}
+sqitch_migrations_sql_jobs:
+  preview_db_user:
+    - file: "{{ reveal_migrations_home }}/3-reveal/jobs/materialized-views/refresh_jurisdictions_materialized_view.sql"
+      schema: "{{ reveal_migration_schema }}"
+      minute: "1"
+    - file: "{{ reveal_migrations_home }}/3-reveal/jobs/materialized-views/refresh_plans_materialzied_view.sql"
+      schema: "{{ reveal_migration_schema }}"
+      minute: "*/10"
+    - file: "{{ reveal_migrations_home }}/3-reveal/jobs/materialized-views/refresh_reporting_lag.sql"
+      schema: "{{ reveal_migration_schema }}"
+      minute: "1"
+    - file: "{{ reveal_migrations_home }}/3-reveal/jobs/materialized-views/refresh_reporting_time.sql"
+      schema: "{{ reveal_migration_schema }}"
+      minute: "1"
+    - file: "{{ reveal_migrations_home }}/3-reveal/jobs/materialized-views/FI/refresh_targets_materialized_view.sql"
+      schema: "{{ reveal_migration_schema }}"
+      minute: "*/20"
+    - file: "{{ reveal_migrations_home }}/3-reveal/jobs/materialized-views/FI/refresh_task_reports.sql"
+      schema: "{{ reveal_migration_schema }}"
+      minute: "*/20"
+    - file: "{{ reveal_migrations_home }}/3-reveal/jobs/monitoring/check-data-integrity.sql"
+      schema: "{{ reveal_migration_schema }}"
+      hour: "1"

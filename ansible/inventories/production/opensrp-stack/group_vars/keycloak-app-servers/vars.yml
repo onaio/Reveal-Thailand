@@ -1,0 +1,28 @@
+---
+keycloak_admin_password: "{{ vault_keycloak_admin_password }}"
+keycloak_postgresql_password: "{{ vault_keycloak_postgresql_password }}"
+keycloak_postgresql_host: "{{ reveal_database_server }}"
+keycloak_postgresql_user: "keycloak"
+keycloak_postgres_superuser: "{{ reveal_postgres_superuser }}"
+keycloak_postgres_superuser_password: "{{ reveal_postgres_superuser_password }}"
+keycloak_postgresql_connection_url: "jdbc:postgresql://{{ keycloak_postgresql_host }}:5432/{{ keycloak_postgresql_database }}"
+keycloak_http_port: 8080
+keycloak_https_port: 8443
+keycloak_certs_from_letsencrypt: false
+keycloak_nginx_max_filesize: "50M"
+keycloak_site_name: "keycloakmhealth.ddc.moph.go.th"
+keycloak_certbot_mail_address: "techops+{{ keycloak_site_name }}@ona.io"
+keycloak_nginx_ssl_src_dir: "{{ reveal_ssl_dir }}"
+keycloak_nginx_ssl_cert_file: "star.moph.go.th.crt"
+keycloak_nginx_ssl_key_file: "star.moph.go.th.key"
+keycloak_nginx_ssl_create_symlink: false
+keycloak_nginx_ssl_remote_src: false
+keycloak_nginx_ssl_dir: "{{ nginx_dir }}/ssl/{{ keycloak_site_name }}"
+keycloak_nginx_upstream_url: "https://{{ reveal_opensrp_stack_server }}:{{ keycloak_https_port }}"
+
+keycloak_ver: '16.1.1'
+keycloak_mirror: https://github.com/keycloak/keycloak/releases/download
+
+keycloak_checksums:
+  # https://github.com/keycloak/keycloak/releases/download/16.1.1/keycloak-16.1.1.tar.gz.sha1
+  '16.1.1': sha1:4acc5d20bc3d26e25aa3bcffbc50ac9b76135c93

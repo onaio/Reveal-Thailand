@@ -1,0 +1,22 @@
+---
+app_env: "preview"
+app_title: "Reveal Web Preview"
+
+deployed_site_name: "web.reveal-th-preview.smartregister.org"
+
+keycloak_realm: "reveal-thailand-preview"
+keycloak_url: "https://keycloak.smartregister.org"
+
+opensrp_client_id: "reveal-thailand-preview"
+opensrp_server_url: "https://reveal-th-preview.smartregister.org"
+
+reveal_app_ga_code: "UA-154169046-1"
+reveal_certbot_mail_address: "techops+{{ deployed_site_name }}@ona.io"
+reveal_monit_email_admins:
+  - {"Ona Devops", "techops+{{ deployed_site_name }}@ona.io"}
+reveal_navbar_brand_img_src: "https://github.com/onaio/reveal-frontend/raw/master/src/assets/images/thai-logo.png"
+reveal_enabled_plan_types: "FI,Dynamic-FI"
+reveal_map_disabled_plan_types: "FI,Dynamic-FI"
+reveal_sentry_dsn: "https://b6f390ab22ac4741b7634e209b437b57@sentry.onalabs.org/93"
+
+superset_url: "https://supersetmhealth.ddc.moph.go.th"

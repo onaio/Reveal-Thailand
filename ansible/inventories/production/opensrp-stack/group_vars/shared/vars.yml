@@ -1,0 +1,53 @@
+---
+superset_deployed_site_name: "supersetmhealth.ddc.moph.go.th"
+superset_user: "superset-user"
+superset_version: 0.37.0
+
+# nifi
+nifi_deployed_site_name: "nifimhealth.ddc.moph.go.th"
+
+# Logstash
+logstash_major_ver: "7.x"
+logstash_minor_ver: "1:7.*"
+clear_logstash_config: true
+logstash_system_groups: ["adm"]
+config_logstash: true
+logstash_plugins:
+  - name: logstash-output-gelf
+    state: present
+logstash_custom_outputs:
+  - output: "gelf"
+    lines:
+      - 'host => "{{ graylog_server }}"'
+      - 'port => "{{ graylog_port }}"'
+      - 'sender => "{{ ansible_hostname }}"'
+logstash_custom_inputs:
+  - input: "file"
+    lines:
+      - 'path => ["/var/log/nginx/{{ superset_deployed_site_name }}-ssl-access.log"]'
+      - 'start_position => "end"'
+      - "add_field => {"
+      - "  ssl => false"
+      - "  nginx_access => true"
+      - "  from_nginx => true"
+      - "  from_ona => false"
+      - '  from_host => "%{host}"'
+      - '  from_domain => "{{ superset_deployed_site_name }}"'
+      - "  from_{{ superset_user }} => true"
+      - '  git_version => "{{ superset_version }}"'
+      - "}"
+  - input: "file"
+    lines:
+      - 'path => ["/var/log/nginx/{{ nifi_deployed_site_name }}-ssl-access.log"]'
+      - 'start_position => "end"'
+      - "add_field => {"
+      - "  ssl => false"
+      - "  nginx_access => true"
+      - "  from_nginx => true"
+      - "  from_ona => false"
+      - '  from_host => "%{host}"'
+      - '  from_domain => "{{ nifi_deployed_site_name }}"'
+      - "  from_nifi => true"
+      - '  git_version => "{{ nifi_version }}"'
+      - "}"
+logstash_openjdk_version: "{{ reveal_openjdk_version }}"

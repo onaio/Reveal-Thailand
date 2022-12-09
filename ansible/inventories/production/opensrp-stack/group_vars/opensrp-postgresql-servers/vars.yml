@@ -1,0 +1,128 @@
+---
+postgresql_version: "11"
+postgresql_cluster_name: "main"
+postgresql_cluster_reset: false
+reveal_postgres_bvbd_user: "bvbd"
+postgresql_users:
+  - name: "{{ reveal_postgres_superuser }}"
+    pass: "{{ reveal_postgres_superuser_password }}"
+    encrypted: yes
+  - name: "{{ reveal_postgres_reveal_user }}"
+    pass: "{{ reveal_postgres_reveal_password }}"
+    encrypted: yes
+  - name: "{{ reveal_postgres_canopy_user }}"
+    pass: "{{ reveal_postgres_canopy_password }}"
+    encrypted: yes
+  - name: "{{ reveal_postgres_bvbd_user }}"
+    pass: "{{ reveal_postgres_bvbd_password }}"
+    encrypted: yes
+postgresql_backup_system_user: "postgres"
+postgresql_backup_system_group: "postgres"
+postgresql_backup_opsgenie_api_key: "{{ server_monitoring_opsgenie_api_key }}"
+postgresql_backup_gpg_private_key: "{{ reveal_backup_gpg_dir }}/{{ postgresql_backup_gpg_key_id }}-priv.key"
+postgresql_backup_gpg_public_key: "{{ reveal_backup_gpg_dir }}/{{ postgresql_backup_gpg_key_id }}-pub.key"
+postgresql_backup_gpg_trust_file: "{{ reveal_backup_gpg_dir }}/{{ postgresql_backup_gpg_key_id }}-ultimate.trust"
+postgresql_backup_gpg_key_id: "{{ reveal_backup_gpg_key_id }}"
+postgresql_backup_gpg_pass: "{{ reveal_backup_gpg_key_password }}"
+postgresql_enable_ssl: true
+postgresql_ssl_domain: "{{ reveal_postgres_host }}"
+postgresql_ssl_ca_key: "{{ lookup('file', 'ansible/inventories/production/opensrp-stack/files/tls/root.key') }}"
+postgresql_ssl_ca_cert: "{{ lookup('file', 'ansible/inventories/production/opensrp-stack/files/tls/root.crt') }}"
+postgresql_listen_addresses:
+  - "localhost"
+  - "{{ reveal_database_server }}"
+postgresql_pg_hba_trust_hosts:
+  - "{{ reveal_database_server }}/32"
+  - "{{ reveal_opensrp_stack_server }}/32"
+  - "{{ reveal_canopy_server }}/32"
+  - "{{ reveal_new_db }}/32"
+postgresql_backup_database: "{{ reveal_opensrp_postgresql_database }}"
+postgresql_databases:
+  - name: "{{ reveal_opensrp_postgresql_database }}"
+    owner: "{{ reveal_postgres_superuser }}"
+    uuid_ossp: yes
+    citext: yes
+postgresql_user_privileges:
+  - name: "{{ reveal_postgres_superuser }}"
+    db: "{{ reveal_opensrp_postgresql_database }}"
+    priv: "ALL"
+    role_attr_flags: "SUPERUSER"
+  - name: "{{ reveal_postgres_reveal_user }}"
+    db: "{{ reveal_postgresql_database }}"
+    priv: "ALL"
+    role_attr_flags: "SUPERUSER"
+  - name: "{{ reveal_postgres_canopy_user }}"
+    db: "{{ reveal_postgresql_database }}"
+    priv: "ALL"
+  - name: "{{ reveal_postgres_bvbd_user }}"
+    db: "{{ reveal_postgresql_database }}"
+    priv: "ALL"
+  - name: "{{ reveal_postgres_bvbd_user }}"
+    db: "{{ reveal_opensrp_postgresql_database }}"
+    priv: "ALL"
+
+# NiFi PostgreSQL connection requirements:
+#   pool |  connections    |  description
+# -------|-----------------|---------------------------------------------
+#    1   |  300            |  all ingestion into raw data tables
+#    1   |  150            |  plans, clients
+#    4   |  200 (50 each)  |  events, locations, jurisdictions, tasks
+#    2   |  16 (8 each)    |  sync monitoring
+# Max connections: 450 + 216
+# Total number of connections = 666 for NiFi + 100 for the rest of the services
+postgresql_max_connections: 766
+backup_initial_run: false
+postgresql_backup_target_user: "{{ reveal_s3_backup_access_key }}"
+postgresql_backup_target_pass: "{{ reveal_s3_backup_secret_key }}"
+postgresql_backup_profiles:
+  - name: "{{ opensrp_postgresql_database }}"
+    schedule: 0 1 * * *
+    source: "postgresql://{{ opensrp_postgresql_database }}"
+    target: "{{ reveal_backup_s3_url }}/database/{{ opensrp_postgresql_database }}"
+    max_age: "1M" # Time frame for old backups to keep.
+    full_max_age: "1W" # forces a full backup if last full backup reaches a specified age
+    max_full_backups: 4 # Number of full backups to keep.
+    user: "{{ postgresql_backup_system_user }}"
+    gpg_key: "{{ postgresql_backup_gpg_key_id }}"
+    gpg_pw: "{{ postgresql_backup_gpg_pass }}"
+    gpg_opts: "{{ postgres_backup_gpg_opts }}"
+    gpg_private_key_src: "{{ postgresql_backup_gpg_private_key }}"
+    gpg_public_key_src: "{{ postgresql_backup_gpg_public_key }}"
+    post_actions:
+      - type: "command"
+        on_error:
+          command: "{{ postgresql_backup_on_error_command }}"
+  - name: "{{ keycloak_postgresql_database }}"
+    schedule: 0 1 * * *
+    source: "postgresql://{{ keycloak_postgresql_database }}"
+    target: "{{ reveal_backup_s3_url }}/database/{{ keycloak_postgresql_database }}"
+    max_age: "1M" # Time frame for old backups to keep.
+    full_max_age: "1W" # forces a full backup if last full backup reaches a specified age
+    max_full_backups: 4 # Number of full backups to keep.
+    user: "{{ postgresql_backup_system_user }}"
+    gpg_key: "{{ postgresql_backup_gpg_key_id }}"
+    gpg_pw: "{{ postgresql_backup_gpg_pass }}"
+    gpg_opts: "{{ postgres_backup_gpg_opts }}"
+    gpg_private_key_src: "{{ postgresql_backup_gpg_private_key }}"
+    gpg_public_key_src: "{{ postgresql_backup_gpg_public_key }}"
+    post_actions:
+      - type: "command"
+        on_error:
+          command: "{{ postgresql_backup_on_error_command }}"
+  - name: "{{ reveal_postgresql_database }}"
+    schedule: 0 1 * * *
+    source: "postgresql://{{ reveal_postgresql_database }}"
+    target: "{{ reveal_backup_s3_url }}/database/{{ reveal_postgresql_database }}"
+    max_age: "1M" # Time frame for old backups to keep.
+    full_max_age: "1W" # forces a full backup if last full backup reaches a specified age
+    max_full_backups: 4 # Number of full backups to keep.
+    user: "{{ postgresql_backup_system_user }}"
+    gpg_key: "{{ postgresql_backup_gpg_key_id }}"
+    gpg_pw: "{{ postgresql_backup_gpg_pass }}"
+    gpg_opts: "{{ postgres_backup_gpg_opts }}"
+    gpg_private_key_src: "{{ postgresql_backup_gpg_private_key }}"
+    gpg_public_key_src: "{{ postgresql_backup_gpg_public_key }}"
+    post_actions:
+      - type: "command"
+        on_error:
+          command: "{{ postgresql_backup_on_error_command }}"                    

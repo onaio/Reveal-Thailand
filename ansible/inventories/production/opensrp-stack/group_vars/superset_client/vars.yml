@@ -1,0 +1,23 @@
+---
+keycloak_realm: "reveal-thailand-production"
+keycloak_url: "https://keycloakmhealth.ddc.moph.go.th"
+
+opensrp_server_url: "https://servermhealth.ddc.moph.go.th"
+
+reveal_database_server: "192.168.100.27"
+
+superset_app_name: "Reveal"
+superset_certbot_mail_address: "techops+{{ superset_server_name }}@ona.io"
+superset_consumer_key: "reveal-thailand-production"
+superset_email: "support+{{ superset_server_name }}@ona.io"
+superset_postgres_db_host: "{{ reveal_database_server }}"
+superset_postgres_db_name: "superset"
+superset_postgres_db_user: "superset"
+superset_postgres_login_user: "reveal"
+superset_server_name: "supersetmhealth.ddc.moph.go.th"
+superset_version: "0.37.0"
+
+preview_keycloak_realm: "reveal-thailand-preview"
+preview_keycloak_url: "https://keycloak.smartregister.org"
+preview_opensrp_server_url: "https://reveal-th-preview.smartregister.org"
+preview_superset_consumer_key: "reveal-thailand-preview"

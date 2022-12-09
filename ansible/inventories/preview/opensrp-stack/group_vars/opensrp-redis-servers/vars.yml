@@ -1,0 +1,12 @@
+redis_version: "7.0.4"
+redis_password: "{{ reveal_redis_password }}"
+redis_bind_address: "{{ database_host }}"
+redis_download_url: "https://download.redis.io/releases/redis-{{ redis_version }}.tar.gz"
+
+# Backups
+redis_backup_enabled: true
+redis_backup_import_gpg_keys: true
+redis_backup_gpg_private_key: "{{ reveal_backup_gpg_dir }}/{{ reveal_backup_gpg_key_id }}-priv.key"
+redis_backup_gpg_public_key: "{{ reveal_backup_gpg_dir }}/{{ reveal_backup_gpg_key_id }}-pub.key"
+redis_backup_gpg_trust_file: "{{ reveal_backup_gpg_dir }}/{{ reveal_backup_gpg_key_id }}-ultimate.trust"
+redis_backup_gpg_pass: "{{ reveal_backup_gpg_key_password }}"

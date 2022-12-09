@@ -1,0 +1,6 @@
+---
+ansible_host: "203.157.41.89"
+ansible_user: mhealth
+collectd_version: "5.7.*"
+monit_version: "1:5.*"
+server_monitoring_hostname: "canopy-server-0"

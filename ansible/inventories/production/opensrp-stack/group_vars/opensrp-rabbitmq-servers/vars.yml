@@ -1,0 +1,15 @@
+rabbitmq_users:
+  - user: "{{ opensrp_rabbitmq_username }}"
+    password: "{{ opensrp_rabbitmq_password }}"
+    vhost: /
+    configure_priv: .*
+    read_priv: .*
+    write_priv: .*
+    tags: administrator
+
+rabbitmq_create_cluster: no
+rabbitmq_cluster_master: "localhost"
+rabbitmq_amqp_port: "{{ opensrp_rabbitmq_port }}"
+rabbitmq_distribution: bionic
+rabbitmq_erlang_version: 1:24.*
+rabbitmq_server_version: 3.8.18-1
