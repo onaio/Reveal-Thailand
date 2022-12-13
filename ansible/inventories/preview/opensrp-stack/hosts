@@ -1,0 +1,26 @@
+# Inventory files are for grouping hosts into groups and groups into other groups. Avoid setting variables here
+[monitored-servers:children]
+application-server
+database-server
+
+[keycloak-app-servers]
+application-server
+
+[opensrp-app-servers]
+application-server
+
+[opensrp-redis-servers]
+database-server
+
+[opensrp-rabbitmq-servers]
+database-server
+
+[opensrp-postgresql-servers]
+database-server
+
+[monitored-by-ona]
+application-server
+database-server
+
+[monitored-servers:children]
+monitored-by-ona

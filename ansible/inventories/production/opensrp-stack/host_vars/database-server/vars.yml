@@ -1,0 +1,24 @@
+ansible_host: "{{ reveal_database_server }}"
+
+monit_system_memory_usage_thresholds:
+  - value: "90%"
+    operator: ">"
+    cycles: 3
+    exec_scripts:
+      - slack-notification
+      - opsgenie-notification
+monit_system_cpu_usage_thresholds:
+  - type: user
+    value: "90%"
+    operator: ">"
+    cycles: 3
+    exec_scripts:
+      - slack-notification
+      - opsgenie-notification
+  - type: system
+    value: "90%"
+    operator: ">"
+    cycles: 3
+    exec_scripts:
+      - slack-notification
+      - opsgenie-notification

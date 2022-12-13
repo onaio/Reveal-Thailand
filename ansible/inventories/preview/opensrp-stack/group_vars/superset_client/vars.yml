@@ -1,0 +1,15 @@
+---
+keycloak_realm: "reveal-thailand-preview"
+keycloak_url: "https://keycloak.smartregister.org"
+
+opensrp_server_url: "https://reveal-th-preview.smartregister.org"
+
+superset_app_name: "Reveal Preview"
+superset_certbot_mail_address: "techops+{{ superset_server_name }}@ona.io"
+superset_consumer_key: "reveal-thailand-preview"
+superset_email: "support+{{ superset_server_name }}@ona.io"
+superset_postgres_db_host: "postgres.reveal-th-preview.smartregister.org"
+superset_postgres_db_name: "superset"
+superset_postgres_db_user: "superset"
+superset_postgres_login_user: "reveal"
+superset_server_name: "superset.reveal-th-preview.smartregister.org"

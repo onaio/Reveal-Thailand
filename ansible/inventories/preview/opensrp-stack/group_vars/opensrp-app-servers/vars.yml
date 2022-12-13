@@ -1,0 +1,108 @@
+tomcat_http_port: 8080
+tomcat_https_port: 8443
+tomcat_shutdown_port: 8005
+tomcat_ajp_port: 8009
+tomcat_xmx: 3584M
+tomcat_xms: 2560M
+tomcat_max_filesize: "52428800"
+tomcat_fsize_threshold: "10485760"
+tomcat_logs_archives_to_keep: 60
+catalina_ops: "-Xms2560M -Xmx3584M"
+opensrp_site_name: "preview-servermhealth.{{ reveal_site_name }}"
+opensrp_version: "v2.10.10-SNAPSHOT"
+opensrp_redis_host: "{{ reveal_redis_host }}"
+opensrp_redis_password: "{{ reveal_redis_password }}"
+opensrp_postgresql_password: "{{ reveal_opensrp_postgresql_user_password }}"
+opensrp_postgres_host: "{{ database_host }}"
+opensrp_postgresql_user: "{{ reveal_opensrp_postgresql_user }}"
+opensrp_postgresql_database: "{{ reveal_opensrp_postgresql_database }}"
+opensrp_install_postgres: yes
+opensrp_install_mysql: no
+opensrp_configure_mysql: false
+mysql_install_server: false
+opensrp_postgres_superuser: "{{ reveal_postgres_superuser }}"
+opensrp_postgres_superuser_password: "{{ reveal_postgres_superuser_password }}"
+opensrp_certs_from_letsencrypt: false
+opensrp_certbot_mail_address: "techops+{{ reveal_site_name }}@ona.io"
+opensrp_postgres_sslmode: "require"
+opensrp_nginx_enabled_sites:
+  - "{{ opensrp_http_site }}"
+  - "{{ opensrp_https_site }}"
+opensrp_nginx_logstash_log: "{{ opensrp_nginx_log_dir }}/{{ opensrp_http_site }}-access.log"
+opensrp_install_logstash: true
+opensrp_logstash_gelf_server: graylog.onalabs.org
+opensrp_ssl_src_dir: "{{ reveal_ssl_dir }}"
+opensrp_ssl_cert_file: "{{ reveal_ssl_cert_file }}"
+opensrp_ssl_key_file: "{{ reveal_ssl_key_file }}"
+opensrp_nginx_sites:
+  - server:
+      name: "{{ opensrp_http_site }}"
+      __listen: "80;\n  listen [::]:80;\n"
+      server_name: "{{ opensrp_site_name }}"
+      access_log: "/var/log/nginx/{{ opensrp_site_name }}.access.log"
+      error_log: "/var/log/nginx/{{ opensrp_site_name }}.error.log"
+      return: "301 https://$server_name$request_uri"
+      ssl:
+        enabled: false
+  - server:
+      name: "{{ opensrp_https_site }}"
+      __listen: "443;\n  listen [::]:443;\n"
+      server_name: "{{ opensrp_site_name }}"
+      client_body_timeout: 300
+      client_header_timeout: 300
+      send_timeout: 300
+      add_header: "Strict-Transport-Security 'max-age=31536000; includeSubDomains; preload'"
+      client_max_body_size: "{{ opensrp_nginx_max_filesize }}"
+      large_client_header_buffers: "{{ opensrp_nginx_client_header_buffers }}"
+      ssl:
+        enabled: true
+        cert: "{{ opensrp_ssl_cert_file }}"
+        key: "{{ opensrp_ssl_key_file }}"
+        src_dir: "{{ opensrp_ssl_src_dir }}"
+        conf: "{{ opensrp_site_name }}-ssl.conf"
+        remote_src: false
+        create_symlink: false
+        access_log_format: "timed_combined"
+
+      location1:
+        name: "= /"
+        return: "301 https://$host/{{ opensrp_install_name }}/"
+
+      location2:
+        name: "/{{ opensrp_install_name }}"
+        proxy_pass: "http://localhost:{{ opensrp_tomcat_http_port }}/{{ opensrp_install_name }}"
+        proxy_read_timeout: "86400s"
+        proxy_redirect: "off"
+        proxy_next_upstream: "error timeout invalid_header http_502 http_503 http_504"
+        proxy_set_header:
+          - Host $host
+          - X-Real-IP $remote_addr
+          - X-Forwarded-For $proxy_add_x_forwarded_for
+          - X-Forwarded-Host $server_name
+          - X-Forwarded-Proto https
+      location3:
+        name: "/{{ opensrp_install_name }}/metrics"
+        return: "403"
+
+opensrp_maven_package_profiles:
+  - postgres
+  - jedis
+  - oauth2
+  - rabbitmq
+  - plan-generation
+
+#keycloak configs
+opensrp_keycloak_realm: "reveal-thailand-preview"
+opensrp_keycloak_auth_server_url: "https://preview-keycloakmhealth.{{ reveal_site_name }}/auth/"
+opensrp_keycloak_client: "reveal-thailand-preview"
+opensrp_keycloak_client_secret: "{{ vault_opensrp_keycloak_client_secret }}"
+
+opensrp_cors_allowed_source: "https://preview-mhealth.{{ reveal_site_name }}"
+
+# sentry configs
+opensrp_sentry_dsn: "{{ vault_opensrp_sentry_dsn }}"
+
+opensrp_sentry_tags:
+  release-namespace: "reveal-th-preview"
+  release-name: "opensrp-server-web"
+  release-type: "ansible"

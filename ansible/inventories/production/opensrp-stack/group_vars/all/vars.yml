@@ -1,0 +1,77 @@
+---
+# General
+timezone: "Asia/Bangkok"
+ansible_user: "mhealth"
+
+# Server monitoring
+server_monitoring_graphite_server_ip: "graphite-api.onalabs.org"
+collectd_version: "5.7.*"
+graylog_port: 12204
+graylog_server: "graylog.onalabs.org"
+server_monitoring_server_type: "production"
+server_monitoring_owner: "reveal-thailand"
+slack_monit_endpoint: "T02FWKFH7/B01BLBB93N1/qkcii0ZvjHSXIE3pCAtlpZiR"
+server_monitoring_hostname_from_ec2_Name_tag: false
+server_monitoring_set_hostname: true
+server_monitoring_graphite_server_port: 2003
+server_monitoring_graphite_server_protocol: "tcp"
+server_monitoring_hostname: "{{ inventory_hostname }}"
+server_monitoring_opsgenie_api_key: "{{ vault_server_monitoring_opsgenie_api_key }}"
+
+# Monit
+monit_version: "1:5.*"
+monit_opsgenie_api_key: "{{ vault_monit_opsgenie_api_key }}"
+
+# ssh
+ssh_vault_url: "https://vault.onalabs.org"
+ssh_vault_trusted_user_ca_keys:
+  - name: "opensrp-production.pem"
+    src: "ssh/opensrp/production"
+  - name: "canopy-production.pem"
+    src: "ssh/canopy/production"
+        
+ssh_users:
+  mhealth:
+    authorized_keys:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC348AuNM73zpVNIeQa50zBLuOUf/KKOPzhkd9cODrI+ytbRhZSghSohlg5iQhVoW0sN43sIyYS4SRRti6oBv6iSXYgJOfu6LXxgQHPitfi7UgyfFDdnHmuEFcx/d+loVclhQ9YwmibsS8IQdArONOzDaFWvVzYy9es4qiYSYK+ZRl39BkmdOAjkjapbfv0KVHfQuTrfmwqmhm/XCk89nXlPjFiolRjtLETYXFojg6UvWPqxX3Af808zJrLbuqYrSdNI9B0hbl27WhFDWnDFIbfU7/Vt8MO9hdM7khRQQC278UIm9FS4vyEAoY6cPFLeNOtKb/gVBxi9dfH/LMSU8Lr techops@ona.io"
+
+# shared vars
+reveal_redis_password: "{{ vault_reveal_redis_password }}"
+
+reveal_mysql_host: ""
+reveal_postgres_host: "database-server"
+reveal_redis_host: "{{ reveal_database_server }}"
+reveal_postgres_superuser: "postgres"
+reveal_postgres_superuser_password: "{{ vault_reveal_postgres_superuser_password }}"
+reveal_postgres_reveal_user: "reveal"
+reveal_postgres_reveal_password: "{{ vault_reveal_postgres_reveal_password }}"
+reveal_postgres_canopy_user: "canopy"
+reveal_postgres_canopy_password: "{{ vault_reveal_postgres_canopy_password }}"
+reveal_opensrp_postgresql_database: "opensrp_reveal_th"
+reveal_postgresql_database: "reveal1"
+reveal_backup_gpg_dir: "../Reveal-Thailand/ansible/inventories/production/opensrp-stack/files/pgp"
+reveal_ssl_dir: "../Reveal-Thailand/ansible/inventories/production/opensrp-stack/files/ssl"
+reveal_backup_gpg_key_id: "5E7F4289"
+reveal_backup_gpg_key_password: "{{ vault_reveal_backup_gpg_key_password }}"
+reveal_s3_backup_access_key: "{{ vault_reveal_s3_backup_access_key }}"
+reveal_s3_backup_secret_key: "{{ vault_reveal_s3_backup_secret_key }}"
+reveal_backup_target_user: "LTAI4G7z1qt4nRNyZzkL1HdJ"
+reveal_backup_target_pass: "{{ valut_reveal_backup_target_pass }}"
+opensrp_postgresql_database: "opensrp"
+keycloak_postgresql_database: "keycloak"
+reveal_backup_s3_url: "s3://s3.ap-southeast-1.amazonaws.com/dvbd-backup/opensrp/production"
+
+# Required till upgrade is done
+openmrs_site_name: ""
+openmrs_install_name: ""
+
+#Host Vars
+reveal_opensrp_stack_server: "203.157.41.37"
+reveal_database_server: "192.168.100.27"
+reveal_canopy_server: "203.157.41.89"
+reveal_new_db: "192.168.100.252"
+
+#Rabbitmq config
+opensrp_rabbitmq_host: "localhost"
+opensrp_rabbitmq_username: "opensrp_reveal"
+opensrp_rabbitmq_password: "{{ vault_opensrp_rabbitmq_password }}"

@@ -1,0 +1,126 @@
+ansible_host: "{{ reveal_opensrp_stack_server }}"
+tomcat_user: "tomcat7"
+tomcat_group: "tomcat7"
+tomcat_http_port: 8080
+tomcat_https_port: 8443
+tomcat_shutdown_port: 8005
+tomcat_ajp_port: 8009
+tomcat_max_filesize: "52428800"
+tomcat_fsize_threshold: "10485760"
+tomcat_xmx: 6144M
+tomcat_xms: 3072M
+catalina_ops: "-Xms3072M -Xmx6144M"
+opensrp_mysql_host: ""
+opensrp_mysql_database: "opensrp"
+opensrp_motech_database: "motechquartz"
+opensrp_mysql_user: "opensrp"
+opensrp_mysql_app_host: "{{ ansible_default_ipv4.address }}"
+opensrp_mysql_password: "{{ vault_opensrp_mysql_password }}"
+opensrp_install_name: "opensrp"
+opensrp_resource_dir: "/var/lib/OpenSRP"
+opensrp_version: "v2.9.3-SNAPSHOT"
+opensrp_openmrs_user: "admin"
+opensrp_dhis_url: "https://dhis-stage.ona.io/api/"
+opensrp_dhis_user: "admin"
+opensrp_dhis_password: "{{ vault_opensrp_dhis_password }}"
+opensrp_rapidpro_url: "https://rapidpro.ona.io"
+opensrp_rapidpro_token: "{{ vault_opensrp_rapidpro_token }}"
+opensrp_nginx_max_filesize: "50M"
+opensrp_nginx_client_header_buffers: "4 16k"
+opensrp_activemq_host: "127.0.0.1"
+opensrp_redis_host: "{{ reveal_redis_host }}"
+opensrp_redis_password: "{{ reveal_redis_password }}"
+opensrp_postgresql_password: "{{ vault_opensrp_postgresql_password }}"
+opensrp_postgres_host: "{{ reveal_database_server }}"
+opensrp_postgresql_user: "opensrp"
+opensrp_install_postgres: no
+opensrp_install_mysql: no
+opensrp_configure_mysql: false
+mysql_install_server: false
+opensrp_mysql_root_user: "{{ reveal_mysql_root_user }}"
+opensrp_mysql_root_password: "{{ reveal_mysql_root_password }}"
+opensrp_postgres_superuser: "postgres"
+opensrp_postgres_superuser_password: "{{ vault_reveal_postgres_superuser_password }}"
+opensrp_certs_from_letsencrypt: true
+opensrp_certbot_mail_address: "techops+{{ opensrp_site_name }}@ona.io"
+opensrp_site_name: "servermhealth.ddc.moph.go.th"
+opensrp_postgres_ca_bundle_content: "{{ lookup('file', '../Reveal-Thailand/ansible/inventories/production/opensrp-stack/files/tls/root.crt') }}"
+pensrp_http_site: "{{ opensrp_site_name }}-http"
+pensrp_https_site: "{{ opensrp_site_name }}-https"
+opensrp_nginx_enabled_sites:
+  - "{{ opensrp_http_site }}"
+  - "{{ opensrp_https_site }}"
+opensrp_nginx_logstash_log: "{{ opensrp_nginx_log_dir }}/{{ opensrp_https_site }}-access.log"
+opensrp_install_logstash: true
+opensrp_logstash_gelf_server: graylog.onalabs.org
+opensrp_nginx_sites:
+  - server:
+      name: "{{ opensrp_http_site }}"
+      __listen: "80;\n  listen [::]:80;\n"
+      server_name: "{{ opensrp_site_name }}"
+      access_log: "/var/log/nginx/{{ opensrp_site_name }}.access.log"
+      error_log: "/var/log/nginx/{{ opensrp_site_name }}.error.log"
+      return: "301 https://$server_name$request_uri"
+      ssl:
+        enabled: false
+  - server:
+      name: "{{ opensrp_https_site }}"
+      __listen: "443;\n  listen [::]:443;\n"
+      server_name: "{{ opensrp_site_name }}"
+      client_max_body_size: "{{ opensrp_nginx_max_filesize }}"
+      large_client_header_buffers: "{{ opensrp_nginx_client_header_buffers }}"
+      access_log: "{{ opensrp_nginx_logstash_log }} timed_combined"
+      add_header: "Strict-Transport-Security 'max-age=31536000; includeSubDomains; preload'"
+      client_body_timeout: 60
+      client_header_timeout: 60
+      send_timeout: 60
+      ssl:
+        enabled: true
+        cert: "star.moph.go.th.crt"
+        key: "star.moph.go.th.key"
+        src_dir: "{{ reveal_ssl_dir }}"
+        conf: "{{ opensrp_site_name }}-ssl.conf"
+        remote_src: false
+        create_symlink: false
+        access_log_format: "timed_combined"
+      location1:
+        name: "= /"
+        return: "301 https://$host/{{ opensrp_install_name }}/"
+      location2:
+        name: "/{{ opensrp_install_name }}"
+        proxy_pass: "http://localhost:{{ opensrp_tomcat_http_port }}/{{ opensrp_install_name }}"
+        proxy_read_timeout: "86400s"
+        proxy_redirect: "off"
+        proxy_next_upstream: "error timeout invalid_header http_502 http_503 http_504"
+        proxy_set_header:
+          - Host $host
+          - X-Real-IP $remote_addr
+          - X-Forwarded-For $proxy_add_x_forwarded_for
+          - X-Forwarded-Host $server_name
+          - X-Forwarded-Proto $scheme
+      location3:
+        name: "/{{ opensrp_install_name }}/metrics"
+        return: "403"
+opensrp_maven_package_profiles:
+  - postgres
+  - jedis
+  - oauth2
+  - rabbitmq
+  - plan-generation
+
+#keycloak configs
+opensrp_keycloak_realm: "reveal-thailand-production"
+opensrp_keycloak_auth_server_url: "https://keycloakmhealth.ddc.moph.go.th/auth/"
+opensrp_keycloak_client: "reveal-thailand-production"
+opensrp_keycloak_client_secret: "{{ vault_opensrp_keycloak_client_secret }}"
+
+opensrp_cors_allowed_source: "https://mhealth.ddc.moph.go.th"
+opensrp_use_opensrp_team_module: false
+tomcat_logs_archives_to_keep: 60
+
+#sentry configs
+opensrp_sentry_dsn: "{{ vault_opensrp_sentry_dsn }}"
+opensrp_sentry_tags:
+  release-namespace: "reveal-thailand"
+  release-name: "opensrp-server-web"
+  release-type: "ansible"

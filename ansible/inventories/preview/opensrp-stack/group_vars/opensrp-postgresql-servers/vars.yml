@@ -1,0 +1,94 @@
+---
+postgresql_version: "12"
+postgresql_cluster_name: "main"
+postgresql_cluster_reset: false
+
+reveal_psql_table_space_dir: "/opt/postgres"
+
+postgresql_tablespaces_dirs:
+  - "{{ reveal_psql_table_space_dir }}/core"
+  - "{{ reveal_psql_table_space_dir }}/error"
+  - "{{ reveal_psql_table_space_dir }}/schedule"
+  - "{{ reveal_psql_table_space_dir }}/feed"
+  - "{{ reveal_psql_table_space_dir }}/form"
+postgresql_users:
+  - name: "{{ reveal_postgres_superuser }}"
+    pass: "{{ reveal_postgres_superuser_password }}"
+    encrypted: yes
+  - name: "{{ reveal_opensrp_postgresql_user }}"
+    pass: "{{ reveal_opensrp_postgresql_user_password }}"
+    encrypted: yes
+postgresql_databases:
+  - name: "{{ reveal_opensrp_postgresql_database }}"
+    owner: "{{ reveal_opensrp_postgresql_user }}"
+    uuid_ossp: yes
+    citext: yes
+
+postgresql_user_privileges:
+  - name: "{{ reveal_postgres_superuser }}"
+    db: "{{ reveal_opensrp_postgresql_database }}"
+    priv: "ALL"
+    role_attr_flags: "SUPERUSER"
+  - name: "{{ reveal_opensrp_postgresql_user }}"
+    db: "{{ reveal_opensrp_postgresql_database }}"
+    priv: "ALL"
+    role_attr_flags: "SUPERUSER"
+
+opensrp_postgres_host: "{{ database_host }}"
+postgresql_backup_system_user: "postgres"
+postgresql_backup_system_group: "postgres"
+
+postgresql_backup_gpg_private_key: "{{ reveal_backup_gpg_dir }}/{{ postgresql_backup_gpg_key_id }}-priv.key"
+postgresql_backup_gpg_public_key: "{{ reveal_backup_gpg_dir }}/{{ postgresql_backup_gpg_key_id }}-pub.key"
+postgresql_backup_gpg_trust_file: "{{ reveal_backup_gpg_dir }}/{{ postgresql_backup_gpg_key_id }}-ultimate.trust"
+postgresql_backup_gpg_key_id: "{{ reveal_backup_gpg_key_id }}"
+postgresql_backup_gpg_pass: "{{ reveal_backup_gpg_key_password }}"
+postgresql_listen_addresses:
+  - "localhost"
+  - "{{ database_host }}"
+postgresql_pg_hba_md5_hosts:
+  - "{{ reveal_application_cidr }}"
+
+reveal_superset_postgres_db_name: "superset" # created by superset using the Postgres superuser account
+
+postgresql_enable_ssl: true
+postgresql_ssl_ca_key: "{{ lookup('file', '../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/files/tls/root.key') }}"
+postgresql_ssl_ca_cert: "{{ lookup('file', '../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/files/tls/root.crt') }}"
+postgresql_ssl_domain: '{{ database_host }}'
+
+postgresql_backup_enabled: true
+postgresql_backup_profiles:
+  - name: "{{ reveal_opensrp_postgresql_database }}"
+    schedule: 0 1 * * *
+    source: "postgresql://{{ reveal_opensrp_postgresql_database }}"
+    target: "{{ postgresql_backup_target }}/{{ reveal_opensrp_postgresql_database }}"
+    max_age: "1M" # Time frame for old backups to keep.
+    full_max_age: "1W" # forces a full backup if last full backup reaches a specified age
+    max_full_backups: 4 # Number of full backups to keep.
+    user: "{{ postgresql_backup_system_user }}"
+    gpg_key: "{{ postgresql_backup_gpg_key_id }}"
+    gpg_pw: "{{ postgresql_backup_gpg_pass }}"
+    gpg_opts: "{{ postgres_backup_gpg_opts }}"
+    gpg_private_key_src: "{{ postgresql_backup_gpg_private_key }}"
+    gpg_public_key_src: "{{ postgresql_backup_gpg_public_key }}"
+    post_actions:
+      - type: "command"
+        on_error:
+          command: "{{ postgresql_backup_on_error_command }}"
+#  - name: "{{ reveal_superset_postgres_db_name }}"
+#    schedule: 0 3 * * *
+#    source: "postgresql://{{ reveal_superset_postgres_db_name }}"
+#    target: "{{ postgresql_backup_target }}/{{ reveal_superset_postgres_db_name }}"
+#    max_age: "1M" # Time frame for old backups to keep.
+#    full_max_age: "1W" # forces a full backup if last full backup reaches a specified age
+#    max_full_backups: 4 # Number of full backups to keep.
+#    user: "{{ postgresql_backup_system_user }}"
+#    gpg_key: "{{ postgresql_backup_gpg_key_id }}"
+#    gpg_pw: "{{ postgresql_backup_gpg_pass }}"
+#    gpg_opts: "{{ postgres_backup_gpg_opts }}"
+#    gpg_private_key_src: "{{ postgresql_backup_gpg_private_key }}"
+#    gpg_public_key_src: "{{ postgresql_backup_gpg_public_key }}"
+#    post_actions:
+#      - type: "command"
+#        on_error:
+#          command: "{{ postgresql_backup_on_error_command }}"

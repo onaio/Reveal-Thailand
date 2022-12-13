@@ -1,0 +1,143 @@
+---
+# General
+timezone: "Asia/Bangkok"
+ansible_user: "ubuntu"
+ansible_python_interpreter: "/usr/bin/python3"
+
+# Server monitoring
+collectd_version: "5.*"
+graylog_port: 12204
+graylog_server: "graylog.onalabs.org"
+monit_version: "1:5.*"
+server_monitoring_graphite_server_ip: "graphite-api.onalabs.org"
+server_monitoring_server_type: "preview"
+server_monitoring_owner: "reveal"
+slack_monit_endpoint: "T02FWKFH7/BDX658VFH/7CgIyAgP1OWkIDTF67q6VVdv"
+opsgenie_api_key: "{{ vault_server_monitoring_opsgenie_api_key }}"
+monit_opsgenie_notification_script: |
+  #!/bin/bash
+  set -eo pipefail
+  TEAM="Digital Health"
+  GENIE_KEY="{{ opsgenie_api_key }}"
+  NUM_OF_PROCESSES=6
+  action=${action:-create}
+  sort=${sort:--%mem}
+
+  usage() {
+    echo ""
+    echo "Sends and Closes alerts on Opsgenie."
+    echo ""
+    echo "usage: $1"
+    echo ""
+    echo "  --help   Shows the supported arguments."
+    echo "                          (example: -%mem,+%mem,-%cpu)"
+    echo "  --sort   string    process property (use three letters) to monitor to sort.Check the ps command --sort for more info."
+    echo "                          (example: -%mem,+%mem,-%cpu. Default is $sort)"
+    echo "  --action string    close or create alert on opsgenie. Script uses alias identifier to close alerts"
+    echo "                          (example: close, create. Default is $action)"
+    echo ""
+    exit 0
+  }
+
+  failMissingArgumentValue() {
+    echo "Error missing argument value for $1"
+    exit 1
+  }
+
+  # Get named arguments
+  while [ $# -gt 0 ]; do
+    if [[ $1 == "--"* ]]; then
+      parameter="${1/--/}"
+      if [[ $parameter == "help" ]]; then
+        usage "$parameter"
+      fi
+      declare "$parameter"="$2"
+    fi
+    shift
+  done
+
+  if [[ -z $action ]]; then
+    failMissingArgumentValue "action"
+  fi
+  if [[ -z $sort ]]; then
+    failMissingArgumentValue "sort"
+  fi
+
+  FETCHED_PROCESSES=$(ps -eo comm,cmd,pid,user,%cpu,%mem --sort="$sort" | head -n $NUM_OF_PROCESSES)
+  ALIAS=$(hostname)-${sort: -3}
+
+  if [[ $action == "create" ]]; then
+    curl --location --request POST 'https://api.opsgenie.com/v2/alerts' \
+      --header 'Authorization: GenieKey '"$GENIE_KEY"'' \
+      --header 'Content-Type: application/json' \
+      --data-raw '{
+        "message": "'"$(hostname)"'",
+        "alias": "'"$ALIAS"'",
+        "description": "'"$MONIT_SERVICE - $MONIT_DESCRIPTION"'",
+        "responders": [{"name":"'"$TEAM"'", "type":"team"}],
+        "note": "'"$(printf "%q" "$FETCHED_PROCESSES")"'",
+        "priority": "P2"
+    }'
+    touch ".$ALIAS"
+  elif [[ $action == "close" && -f ".$ALIAS" ]]; then
+    curl --location --request POST 'https://api.opsgenie.com/v2/alerts/'"$ALIAS"'/close?identifierType=alias' \
+      --header 'Authorization: GenieKey '"$GENIE_KEY"'' \
+      --header "Content-Type: application/json" \
+      --data-raw '{
+        "user":"Monit Script",
+        "source": "'"$(hostname)"'",
+        "note":"Action executed via Alert API"
+    }'
+    rm ".$ALIAS"
+  fi
+  exit 0
+
+server_monitoring_set_hostname: false
+server_monitoring_hostname_from_ec2_Name_tag: false
+server_monitoring_graphite_server_port: 2003
+server_monitoring_graphite_server_protocol: "tcp"
+
+# ssh
+ssh_vault_url: "https://vault.onalabs.org"
+ssh_vault_trusted_user_ca_keys:
+  - name: "opensrp-preview.pem"
+    src: "ssh/opensrp/preview"
+ssh_users:
+  ubuntu:
+    authorized_keys:
+      - "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC348AuNM73zpVNIeQa50zBLuOUf/KKOPzhkd9cODrI+ytbRhZSghSohlg5iQhVoW0sN43sIyYS4SRRti6oBv6iSXYgJOfu6LXxgQHPitfi7UgyfFDdnHmuEFcx/d+loVclhQ9YwmibsS8IQdArONOzDaFWvVzYy9es4qiYSYK+ZRl39BkmdOAjkjapbfv0KVHfQuTrfmwqmhm/XCk89nXlPjFiolRjtLETYXFojg6UvWPqxX3Af808zJrLbuqYrSdNI9B0hbl27WhFDWnDFIbfU7/Vt8MO9hdM7khRQQC278UIm9FS4vyEAoY6cPFLeNOtKb/gVBxi9dfH/LMSU8Lr techops@ona.io"
+      - "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIE+nAHKXbXKeGU4chHuy9x3eUmXam3+cJsLNGchoQJKH pongthepm@biophics.org"
+
+# Reveal Pass (shared group vars variables)
+reveal_application_cidr: "192.168.54.0/24"
+database_host: "192.168.54.12"
+application_host: "192.168.54.11"
+reveal_site_name: "ddc-malaria.org"
+reveal_redis_password: "{{ vault_reveal_redis_password }}"
+reveal_redis_host: "{{ database_host }}"
+reveal_openmrs_site_name: ""
+reveal_openmrs_install_name: ""
+
+reveal_backup_gpg_dir: "../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/files/pgp"
+reveal_backup_gpg_key_id: "96BA8AB4"
+reveal_backup_gpg_key_password: "{{ vault_reveal_backup_gpg_key_password }}"
+
+reveal_postgres_superuser: "reveal"
+reveal_postgres_superuser_password: "{{ vault_opensrp_postgres_superuser_password }}"
+reveal_opensrp_postgresql_database: "opensrp"
+reveal_opensrp_postgresql_user: "opensrp"
+reveal_opensrp_postgresql_user_password: "{{ vault_opensrp_postgresql_password }}"
+
+postgresql_backup_opsgenie_api_key: "{{ opsgenie_api_key }}"
+
+#Rabbitmq config
+opensrp_rabbitmq_host: "{{ database_host }}"
+opensrp_rabbitmq_username: "opensrp_reveal"
+opensrp_rabbitmq_password: "{{ vault_opensrp_rabbitmq_password }}"
+
+openmrs_site_name: ""
+openmrs_install_name: ""
+
+reveal_ssl_dir: "../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/files/ssl"
+reveal_ssl_cert_file: "star.ddc-malaria.org.crt"
+reveal_ssl_key_file: "star.ddc-malaria.org.key"
