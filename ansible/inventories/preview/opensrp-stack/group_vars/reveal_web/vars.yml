@@ -1,6 +1,4 @@
 ---
-ansible_user: mhealth
-
 # Server monitoring
 server_monitoring_set_hostname: true
 server_monitoring_hostname_from_ec2_Name_tag: true
@@ -16,6 +14,7 @@ reveal_map_disabled_plan_types: "Dynamic-FI"
 reveal_enabled_plan_types: "Dynamic-FI"
 reveal_navbar_brand_img_src: "https://github.com/onaio/reveal-frontend/raw/master/src/assets/images/thai-logo.png"
 # react
+reveal_react_system_user: "thailand-web"
 reveal_react_system_user_home: "/home/{{ reveal_react_system_user }}"
 reveal_react_codebase_path: "{{ reveal_react_system_user_home }}/react"
 reveal_react_public_dir: "{{ reveal_react_codebase_path }}/build"
@@ -124,7 +123,7 @@ reveal_express_app_settings:
   EXPRESS_OPENSRP_OAUTH_STATE: "opensrp"
   EXPRESS_OPENSRP_CALLBACK_URL: "https://{{ deployed_site_name }}/oauth/callback/OpenSRP/"
   EXPRESS_OAUTH_GET_STATE_URL: "https://{{ deployed_site_name }}/oauth/state"
-  EXPRESS_PORT: "3100"
+  EXPRESS_PORT: "3000"
   EXPRESS_SESSION_NAME: "reveal-session"
   EXPRESS_SESSION_SECRET: "{{ vault_express_session_secret }}"
   EXPRESS_SESSION_PATH: "/"
@@ -205,7 +204,7 @@ reveal_nginx_sites:
         name: "/"
         autoindex: "off"
         charset: "UTF-8"
-        proxy_pass: http://localhost:3100
+        proxy_pass: http://localhost:3000
         proxy_http_version: 1.1
         proxy_set_header:
           - "Upgrade $http_upgrade"

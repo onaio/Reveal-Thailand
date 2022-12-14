@@ -24,3 +24,9 @@ database-server
 
 [monitored-servers:children]
 monitored-by-ona
+
+[reveal_web]
+application-server
+
+[reveal_web_client:children]
+reveal_web
