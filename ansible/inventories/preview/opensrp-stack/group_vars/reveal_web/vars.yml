@@ -9,7 +9,7 @@ collectd_deployed_app_version: "{{ reveal_react_git_version }}"
 reveal_monit_scripts: ["openssh-server"]
 
 # reveal-web
-react_remote_js_build: false
+reveal_react_remote_js_build: false
 reveal_map_disabled_plan_types: "Dynamic-FI"
 reveal_enabled_plan_types: "Dynamic-FI"
 reveal_navbar_brand_img_src: "https://github.com/onaio/reveal-frontend/raw/master/src/assets/images/thai-logo.png"
@@ -21,6 +21,10 @@ reveal_react_public_dir: "{{ reveal_react_codebase_path }}/build"
 reveal_react_git_url: "https://github.com/onaio/reveal-frontend.git"
 reveal_react_git_version: "v1.9.6"
 reveal_react_git_key: "{{ vault_reveal_react_git_key }}"
+reveal_react_node_version: "16.x"
+reveal_react_build_cmds:
+  - cmd: build
+    path: "{{ react_local_app_path }}"
 reveal_react_app_settings:
   GENERATE_SOURCEMAP: "false"
   SKIP_PREFLIGHT_CHECK: "true"
@@ -40,11 +44,11 @@ reveal_react_app_settings:
   REACT_APP_SUPERSET_API_BASE: "{{ superset_url }}/"
   REACT_APP_SUPERSET_API_ENDPOINT: slice
   REACT_APP_SUPERSET_MAX_RECORDS: 15000
-  REACT_APP_SUPERSET_PLANS_SLICE: 10
-  REACT_APP_SUPERSET_GOALS_SLICE: 11
-  REACT_APP_SUPERSET_JURISDICTIONS_SLICE: 12
-  REACT_APP_SUPERSET_STRUCTURES_SLICE: 13
-  REACT_APP_SUPERSET_TASKS_SLICE: 14
+  REACT_APP_SUPERSET_PLANS_SLICE: 1
+  REACT_APP_SUPERSET_GOALS_SLICE: 1
+  REACT_APP_SUPERSET_JURISDICTIONS_SLICE: 1
+  REACT_APP_SUPERSET_STRUCTURES_SLICE: 1
+  REACT_APP_SUPERSET_TASKS_SLICE: 1
   REACT_APP_ENABLE_OPENSRP_OAUTH: "true"
   REACT_APP_OPENSRP_CLIENT_ID: "{{ opensrp_client_id }}"
   REACT_APP_OPENSRP_ACCESS_TOKEN_URL: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm }}/protocol/openid-connect/token"
