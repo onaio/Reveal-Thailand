@@ -1,7 +1,7 @@
 ---
 # Server monitoring
-server_monitoring_set_hostname: true
-server_monitoring_hostname_from_ec2_Name_tag: true
+server_monitoring_set_hostname: false
+server_monitoring_hostname_from_ec2_Name_tag: false
 collectd_version: "5.*"
 monit_version: "1:5*"
 collectd_deployed_app_name: "Reveal_preview"

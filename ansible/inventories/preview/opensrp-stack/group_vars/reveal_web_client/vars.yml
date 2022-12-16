@@ -5,7 +5,7 @@ app_title: "Reveal Thailand Preview"
 deployed_site_name: "preview-mhealth.{{ reveal_site_name }}"
 
 keycloak_realm: "reveal-thailand-preview"
-keycloak_url: "https://preview-keycloakmhealth.ddc-malaria.org"
+keycloak_url: "https://preview-keycloakmhealth.{{ reveal_site_name }}"
 
 opensrp_client_id: "reveal-thailand-preview"
 opensrp_server_url: "https://preview-servermhealth.{{ reveal_site_name }}"
