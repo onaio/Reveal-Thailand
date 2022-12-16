@@ -119,6 +119,7 @@ reveal_express_app_name: "{{ express_system_user }}"
 reveal_express_codebase_path: "{{ express_system_user_home }}/express"
 reveal_express_app_path: "{{ express_checkout_path }}"
 reveal_express_log_path: "/var/log/{{ express_app_name }}"
+reveal_express_node_version: "16.x"
 reveal_express_app_settings:
   NODE_ENV: "{{ app_env }}"
   EXPRESS_OPENSRP_ACCESS_TOKEN_URL: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm }}/protocol/openid-connect/token"
