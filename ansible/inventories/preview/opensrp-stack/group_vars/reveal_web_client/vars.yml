@@ -19,4 +19,4 @@ reveal_enabled_plan_types: "FI,Dynamic-FI"
 reveal_map_disabled_plan_types: "FI,Dynamic-FI"
 reveal_sentry_dsn: ""
 
-superset_url: "preview-supersetmhealth.{{ reveal_site_name }}"
+superset_url: "https://preview-supersetmhealth.{{ reveal_site_name }}"
