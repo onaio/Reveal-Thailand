@@ -13,3 +13,7 @@ A detailed intoduction to NiFi can be found [here](https://nifi.apache.org/docs/
 
 
 The [Nifi Expression Language docs](https://nifi.apache.org/docs/nifi-docs/html/expression-language-guide.html) provides more details on flowfiles and how they can can be processed.
+
+### Further Reading
+
+[Developer's Guide](https://nifi.apache.org/docs/nifi-docs/html/developer-guide.html)
