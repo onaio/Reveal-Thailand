@@ -126,6 +126,14 @@ Before deployments begin one has to prepare the servers for an ansible deploymen
         *   ```shell
             ansible-playbook -i ../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/ deploy-keycloak.yml --vault-password=~/.vaultpass  -e ansible_user=ubuntu -e ansible_ssh_user=ubuntu
             ```
+*   (Local machine) Deploy opensrp web
+    *   Ensure you are connected to the VPN.
+    *   Ensure you are in the playbooks repository.
+    *   Ensure you are in the opensrp virtual environment.
+    *   Execute the following
+        *   ```shell
+            ansible-playbook -i ../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/ reveal-web.yml --vault-password=~/.vaultpass  -e ansible_user=ubuntu -e ansible_ssh_user=ubuntu
+            ```
 
 Done.
 
