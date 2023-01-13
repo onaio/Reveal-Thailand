@@ -12,5 +12,4 @@ The goal of this integration project is to create a link between Reveal and the 
 
 - Biophics integration is mainly creating a link between Reveal and the Biophics system
 - We need to move case information from the Biophics system into Reveal. _See [index case generation](index-case-generation.md) for more info_
-- The case information is used by Reveal to create plans and interventions. _See [plan generation](plan-generation.md) for more info_
-- Biophics would like to track the interventions as they occur, so we need to send all the data collected by the app back to the biophics system. _See [data sync](data-sync.md) for more info_
+- Biophics would like to track the interventions as they occur, so we need to send all the data collected by the app back to the biophics system. We use SymmetricDS for this, _see [symmetricDS](../symmetricDS/README.md) for more info_
