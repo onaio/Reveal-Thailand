@@ -133,8 +133,74 @@ Before deployments begin one has to prepare the servers for an ansible deploymen
     *   Execute the following
         *   ```shell
             ansible-playbook -i ../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/ reveal-web.yml --vault-password=~/.vaultpass  -e ansible_user=ubuntu -e ansible_ssh_user=ubuntu
-            ```
-
+            ``` 
+*   (Local machine) Deploy superset
+    *   Ensure you are connected to the VPN.
+    *   Ensure you are in the playbooks repository.
+    *   Ensure you are in the opensrp virtual environment.
+        1. Create database and database user manually and set the database user as the database owner
+           ```sql
+           CREATE ROLE <database_owner> WITH LOGIN PASSWORD '<database_password>';`
+           CREATE DATABASE <database_name> OWNER <database_owner>;`
+           ```
+        2. Replace the variables to match the ones intended for the instance
+           - superset/vars.yml
+             ```yml
+             superset_server_name: <your.domain.name>
+             opensrp_client_id: <opensrp-client-id>
+             keycloak_url: <keycloak-url>
+             api_base_url: <opensrp-api-base-url>
+             superset_postgres_db_user: <database_owner> # database user created in the previous step
+             superset_postgres_db_name: <database_name> # database name created in the previous step
+             ```
+           - superset/vault.yml
+             ```yml
+             vault_superset_postgres_db_pass: <database_password> # database password we created in the previous step
+             vault_superset_postgres_db_host: <database_host> # ip or url
+             ```
+        3. Deploy service by running
+           ```shell
+            ansible-playbook -i ../Reveal-Thailand/ansible/inventories/preview/opensrp-stack superset.yml --vault-password=~/.vaultpass  -e ansible_user=ubuntu -e ansible_ssh_user=ubuntu
+           ```
+        4. ssh to the instance
+        5. Activate virtual env by running
+           ```shell
+            source /home/superset/.virtualenv/superset/bin/activate
+           ```
+        6. Then run the following
+           ```shell 
+           export FLASK_APP=superset
+           export PYTHONPATH="/home/superset/app:$PYTHONPATH"
+           superset db upgrade
+           superset init
+           systemctl restart superset.service
+           ```
+*   (Local machine) Deploy Canopy Database
+    *   Ensure you are connected to the VPN.
+    *   Ensure you are in the playbooks repository.
+    *   Ensure you are in the opensrp virtual environment.
+    1. Create database and database user manually and set the database user as the database owner
+       ```sql
+       CREATE ROLE <database_owner> WITH LOGIN PASSWORD '<database_password>';`
+       CREATE DATABASE <database_name> OWNER <database_owner>;`
+       ```
+    2. Replace the variables to match the ones intended for the instance
+       - sqitch_migrations/vars.yml
+         ```yml
+         superset_postgres_db_user: <database_owner># database user we just created in the previous step
+         reveal_migrations_db_name: <database_name> # database name we just created in the previous step
+         ```
+       - sqitch_migrations/vault.yml
+         ```yml
+         vault_db_admin_username: # username for a user that can create a database in the database instance, usually the superuser
+         vault_db_admin_password: # password for the user defined in `vault_db_admin_username`
+         vault_db_user_username: <database_owner> # database user created in the previous step
+         vault_db_user_password: <database_password> # database password created in the previous step
+         vault_db_host: <database_host> # ip or url
+         ```
+       ```shell
+       ansible-playbook -i ../Reveal-Thailand/ansible/inventories/preview/opensrp-stack/ sqitch_migrations.yml --vault-password=~/.vaultpass  -e ansible_user=ubuntu -e ansible_ssh_user=ubuntu
+       ``` 
 Done.
 
 ## Scripts
