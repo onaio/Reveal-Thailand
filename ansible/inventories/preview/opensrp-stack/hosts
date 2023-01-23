@@ -2,6 +2,8 @@
 [monitored-servers:children]
 application-server
 database-server
+superset
+sqitch_migrations
 
 [keycloak-app-servers]
 application-server
@@ -30,3 +32,9 @@ application-server
 
 [reveal_web_client:children]
 reveal_web
+
+[superset]
+192.168.54.13
+
+[sqitch_migrations]
+192.168.54.13
