@@ -149,7 +149,8 @@ Before deployments begin one has to prepare the servers for an ansible deploymen
              superset_server_name: <your.domain.name>
              opensrp_client_id: <opensrp-client-id>
              keycloak_url: <keycloak-url>
-             api_base_url: <opensrp-api-base-url>
+             keycloak_realm: <keycloak-realm>
+             opensrp_server_url: <opensrp-api-base-url>
              superset_postgres_db_user: <database_owner> # database user created in the previous step
              superset_postgres_db_name: <database_name> # database name created in the previous step
              ```

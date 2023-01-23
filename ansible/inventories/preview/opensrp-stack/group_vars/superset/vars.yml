@@ -52,8 +52,10 @@ superset_mapbox_api_key: "{{ vault_superset_mapbox_api_key }}"
 superset_wtf_csrf_enabled: true
 superset_wtf_csrf_time_limit: None
 superset_auth_type: AUTH_OAUTH
-opensrp_client_id: reveal-thailand-preview
+opensrp_client_id: "reveal-thailand-preview"
+opensrp_server_url: "https://preview-servermhealth.ddc-malaria.org"
 keycloak_url: "https://preview-keycloakmhealth.ddc-malaria.org"
+keycloak_realm: "reveal-thailand-preview"
 
 superset_oauth_providers:
   - name: opensrp
@@ -61,9 +63,9 @@ superset_oauth_providers:
     token_key: access_token
     client_id: "'{{ opensrp_client_id }}'"
     client_secret: "'{{ vault_superset_opensrp_secret }}'"
-    api_base_url: "https://preview-servermhealth.ddc-malaria.org/opensrp/"
-    access_token_url: "{{ keycloak_url }}/auth/realms/reveal-thailand-preview/protocol/openid-connect/token"
-    authorize_url: "{{ keycloak_url }}/auth/realms/reveal-thailand-preview/protocol/openid-connect/auth"
+    api_base_url: "{{ opensrp_server_url }}/opensrp/"
+    access_token_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm }}/protocol/openid-connect/token"
+    authorize_url: "{{ keycloak_url }}/auth/realms/{{ keycloak_realm }}/protocol/openid-connect/auth"
     client_kwargs: |
       {
         'scope': 'read'
@@ -71,7 +73,7 @@ superset_oauth_providers:
 superset_languages:
   - key: en
     flag: us
-    name: Englisht
+    name: English
   - key: it
     flag: it
     name: Italian
@@ -160,10 +162,10 @@ nginx_sites:
       error_log: "/var/log/nginx/{{ superset_discover_server_name }}-https.error.log"
       location1:
         name: "/static/assets"
-        alias:  "{{ superset_virtualenv_path }}/lib/python3.8/site-packages/superset/static/assets"
+        alias:  "{{ superset_virtualenv_path }}/lib/{{ superset_python_executable }}/site-packages/superset/static/assets"
       location2:
         name: "/static/appbuilder"
-        alias:  "{{ superset_virtualenv_path }}/lib/python3.8/site-packages/flask_appbuilder/static/appbuilder"
+        alias:  "{{ superset_virtualenv_path }}/lib/{{ superset_python_executable }}/site-packages/flask_appbuilder/static/appbuilder"
       location3:
         name: /
         uwsgi_pass: "unix://{{ superset_wsgi_socket }}"
@@ -187,7 +189,7 @@ nginx_sites:
         uwsgi_buffer_size: "8k"
         uwsgi_busy_buffers_size: "16k"
       ssl:
-        enabled:   true
+        enabled: true
         cert: "fullchain.pem"
         key: "privkey.pem"
         src_dir: "/etc/letsencrypt/live/{{ superset_server_name }}"
