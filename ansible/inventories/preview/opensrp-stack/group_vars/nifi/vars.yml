@@ -1,0 +1,147 @@
+---
+ansible_python_interpreter: "/usr/bin/env python3"
+
+# Monit
+monit_system_mounts:
+  rootfs:
+    path: "/"
+    thresholds:
+      - value: "80%"
+        operator: ">"
+        exec_scripts:
+          - slack-notification
+      - value: "90%"
+        operator: ">"
+        exec_scripts:
+          - slack-notification
+          - opsgenie-notification
+    mount_check:
+      enabled: true
+      test_file:
+        path: "sys"
+        type: "directory"
+      exec_scripts:
+        - slack-notification
+        - opsgenie-notification
+  nifi_content_repo:
+    path: "{{ nifi_content_repo_mount_path }}"
+    thresholds:
+      - value: "80%"
+        operator: ">"
+        exec_scripts:
+          - slack-notification
+      - value: "90%"
+        operator: ">"
+        exec_scripts:
+          - slack-notification
+          - opsgenie-notification
+    mount_check:
+      enabled: true
+      test_file:
+        path: "data"
+        type: "directory"
+      exec_scripts:
+        - slack-notification
+        - opsgenie-notification
+  nifi_other_repos:
+    path: "{{ nifi_other_repos_mount_path }}"
+    thresholds:
+      - value: "80%"
+        operator: ">"
+        exec_scripts:
+          - slack-notification
+      - value: "90%"
+        operator: ">"
+        exec_scripts:
+          - slack-notification
+          - opsgenie-notification
+    mount_check:
+      enabled: true
+      test_file:
+        path: "flowfile"
+        type: "directory"
+      exec_scripts:
+        - slack-notification
+        - opsgenie-notification
+
+reveal_thailand_nifi_domain: "preview-nifimhealth.ddc-malaria.org"
+
+# nifi
+nifi_version: "1.11.4"
+nifi_web_http_port: 8080
+nifi_server_name: "{{ reveal_thailand_nifi_domain }}"
+nifi_uri: "http://localhost:{{ nifi_web_http_port }}"
+nifi_is_secure: false
+nifi_library_directory: "/opt/nifi/nifi-current/lib/"
+nifi_database_repository: "{{ nifi_base_dir }}/database_repository"
+nifi_content_repo_mount_path: "/mnt/nifi-content-repository"
+nifi_content_repositories: ["{{ nifi_content_repo_mount_path }}/data"]
+nifi_other_repos_mount_path: "/mnt/nifi-other-repositories"
+nifi_flowfile_repository: "{{ nifi_other_repos_mount_path }}/flowfile"
+nifi_provenance_repositories: ["{{ nifi_other_repos_mount_path }}/provenance"]
+nifi_backup_enabled: false
+nifi_install_mssql_jdbc_drivers: true
+
+# Certbot
+nifi_certbot_create_certs: true
+nifi_certbot_mail_address: "techops+{{ nifi_server_name }}@ona.io"
+nifi_use_certbot: true
+certbot_site_names:
+  - "{{ nifi_server_name }}"
+
+# NGINX server variables
+nifi_basic_auth_name: admin
+nifi_password: "{{ vault_nifi_password }}"
+nifi_node_jvm_memory: "5120m"
+nifi_nginx_https_site_name: "{{ nifi_server_name }}-https"
+nifi_nginx_http_site_name: "{{ nifi_server_name }}-http"
+nginx_ssl_dir: "{{ nginx_dir }}/ssl/{{ site.server.server_name }}"
+nifi_basic_auth_file: "/etc/nginx/.htpasswd-{{ nifi_server_name }}"
+nifi_nginx_sites:
+  - server:
+      name: "{{ nifi_nginx_http_site_name }}"
+      __listen: "80;\n  listen [::]:80;\n"
+      server_name: "{{ nifi_server_name }}"
+      return: "301 https://$server_name$request_uri"
+      ssl:
+        enabled: false
+  - server:
+      name: "{{ nifi_nginx_https_site_name }}"
+      __listen: "443;\n  listen [::]:443;\n"
+      server_name: "{{ nifi_server_name }}"
+      access_log: "/var/log/nginx/{{ nifi_server_name }}.access.log"
+      error_log: "/var/log/nginx/{{ nifi_server_name }}.error.log"
+      location:
+        name: /
+        proxy_pass: "{{ nifi_uri }}"
+        auth_basic: '"authentication required"'
+        auth_basic_user_file: "{{ nifi_basic_auth_file }}"
+        proxy_set_header:
+          - "X-ProxyScheme https"
+          - "X-ProxyHost {{ nifi_server_name }}"
+          - "X-ProxyPort 443"
+          - "X-ProxyContextPath /"
+      ssl:
+        enabled: true
+        cert: "star.ddc-malaria.org.crt"
+        key: "star.ddc-malaria.org.key"
+        src_dir: "Reveal-Thailand/ansible/inventories/preview/opensrp-stack/files/ssl"
+        conf: "{{ nifi_server_name }}-ssl.conf"
+        remote_src: false
+        create_symlink: false
+        access_log_format: "{{ nginx_access_logs.0.name }}"
+
+nifi_nginx_enabled_sites:
+  - "{{ nifi_nginx_http_site_name }}"
+  - "{{ nifi_nginx_https_site_name }}"
+nginx_default_enable: false
+
+nginx_access_logs:
+  - name: "timed_combined"
+    format: '''$http_x_forwarded_for - $remote_user [$time_local]  "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_time $upstream_response_time $gzip_ratio $request_length'''
+    options: null
+    filename: "access.log"
+nginx_server_name: "{{ nifi_server_name }}"
+
+# Linux config
+linux_config_noatime_srcs: ["/dev/nvme0n1", "/dev/nvme1n1"]
