@@ -1,5 +1,5 @@
 ---
-ansible_user: ubuntu
+ansible_user: user01
 
 # Monitoring hostname
 server_monitoring_set_hostname: True
@@ -7,10 +7,10 @@ server_monitoring_hostname_from_ec2_Name_tag: True
 collectd_version: "5.5.*"
 
 # nifi-registry
-nifi_registry_server_name: nifi-registry-production.ona.io
+nifi_registry_server_name: preview-nifimhealth.ddc-malaria.org
 nifi_registry_port: 18080
 nifi_registry_uri: "http://localhost:{{ nifi_registry_port }}"
-nifi_registry_opsgenie_api_key: "{{ server_monitoring_opsgenie_api_key }}"
+# nifi_registry_opsgenie_api_key: "{{ server_monitoring_opsgenie_api_key }}"
 nifi_enable_ssl: True
 
 # docker
@@ -48,15 +48,20 @@ nginx_sites:
           - "X-ProxyContextPath /"
       ssl:
         enabled: true
-        cert: "star.ona.io.crt"
-        key: "star.ona.io.key"
+        cert: "star.ddc-malaria.org.crt"
+        key: "star.ddc-malaria.org.key"
         src_dir: "files"
         conf: "{{ nifi_registry_server_name }}.conf"
 nginx_enabled_sites:
   - nifi-registry-http
   - nifi-registry
 
-# backup
-nifi_registry_backup_target: "s3://s3-eu-west-1.amazonaws.com/nifi-registry-backups/nifi-registry.ona.io/{{ ansible_hostname }}"
-nifi_registry_backup_target_user: "{{ vault_nifi_registry_backup_target_user }}"
-nifi_registry_backup_target_pass: "{{ vault_nifi_registry_backup_target_pass }}"
+
+canopy_nifi_nginx_basic_auth_file: /etc/nginx/passwdfile
+canopy_nifi_nginx_basic_auth_name: admin
+canopy_nifi_registry_nginx_basic_auth_pass: "{{ vault_canopy_nifi_registry_nginx_basic_auth_pass }}"
+
+# # backup
+# nifi_registry_backup_target: "s3://s3-eu-west-1.amazonaws.com/nifi-registry-backups/nifi-registry.ona.io/{{ ansible_hostname }}"
+# nifi_registry_backup_target_user: "{{ vault_nifi_registry_backup_target_user }}"
+# nifi_registry_backup_target_pass: "{{ vault_nifi_registry_backup_target_pass }}"
