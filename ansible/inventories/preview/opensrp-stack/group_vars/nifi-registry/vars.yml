@@ -1,0 +1,62 @@
+---
+ansible_user: ubuntu
+
+# Monitoring hostname
+server_monitoring_set_hostname: True
+server_monitoring_hostname_from_ec2_Name_tag: True
+collectd_version: "5.5.*"
+
+# nifi-registry
+nifi_registry_server_name: nifi-registry-production.ona.io
+nifi_registry_port: 18080
+nifi_registry_uri: "http://localhost:{{ nifi_registry_port }}"
+nifi_registry_opsgenie_api_key: "{{ server_monitoring_opsgenie_api_key }}"
+nifi_enable_ssl: True
+
+# docker
+docker_pkg_name: docker.io
+
+# nginx
+nifi_registry_basic_auth_file: "{{ canopy_nifi_nginx_basic_auth_file }}"
+nifi_registry_basic_auth_name: "{{ canopy_nifi_nginx_basic_auth_name }}"
+nifi_registry_password: "{{ canopy_nifi_registry_nginx_basic_auth_pass }}"
+nginx_sites:
+  - server:  # the sole purpose of this is to redirect to https
+      name: nifi-registry-http
+      listen:
+        - "80"
+        - "[::]:80"
+      server_name: "{{ nifi_registry_server_name }}"
+      return: "301 https://{{ nifi_registry_server_name }}$request_uri"
+      ssl:
+        enabled: False
+  - server:
+      name: nifi-registry
+      listen: 443
+      server_name: "{{ nifi_registry_server_name }}"
+      access_log: "/var/log/nginx/{{ nifi_registry_server_name }}.access.log"
+      error_log: "/var/log/nginx/{{ nifi_registry_server_name }}.error.log"
+      location:
+        name: /
+        proxy_pass: "{{ nifi_registry_uri }}"
+        auth_basic: '"authentication required"'
+        auth_basic_user_file: "{{ nifi_registry_basic_auth_file }}"
+        proxy_set_header:
+          - "X-ProxyScheme https"
+          - "X-ProxyHost {{ nifi_registry_server_name }}"
+          - "X-ProxyPort 443"
+          - "X-ProxyContextPath /"
+      ssl:
+        enabled: true
+        cert: "star.ona.io.crt"
+        key: "star.ona.io.key"
+        src_dir: "files"
+        conf: "{{ nifi_registry_server_name }}.conf"
+nginx_enabled_sites:
+  - nifi-registry-http
+  - nifi-registry
+
+# backup
+nifi_registry_backup_target: "s3://s3-eu-west-1.amazonaws.com/nifi-registry-backups/nifi-registry.ona.io/{{ ansible_hostname }}"
+nifi_registry_backup_target_user: "{{ vault_nifi_registry_backup_target_user }}"
+nifi_registry_backup_target_pass: "{{ vault_nifi_registry_backup_target_pass }}"
