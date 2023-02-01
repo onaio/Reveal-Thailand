@@ -7,7 +7,7 @@ server_monitoring_hostname_from_ec2_Name_tag: True
 collectd_version: "5.5.*"
 
 # nifi-registry
-nifi_registry_server_name: nifiregistry-chis.rbc.gov.rw
+nifi_registry_server_name: preview-nifiregistrymhealth.ddc-malaria.org
 nifi_registry_port: 18080
 nifi_registry_uri: "http://localhost:{{ nifi_registry_port }}"
 nifi_registry_opsgenie_api_key: "{{ server_monitoring_opsgenie_api_key }}"
