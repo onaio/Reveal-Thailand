@@ -7,21 +7,26 @@ server_monitoring_hostname_from_ec2_Name_tag: True
 collectd_version: "5.5.*"
 
 # nifi-registry
-nifi_registry_server_name: preview-nifimhealth.ddc-malaria.org
+nifi_registry_server_name: nifiregistry-chis.rbc.gov.rw
 nifi_registry_port: 18080
 nifi_registry_uri: "http://localhost:{{ nifi_registry_port }}"
-# nifi_registry_opsgenie_api_key: "{{ server_monitoring_opsgenie_api_key }}"
-nifi_enable_ssl: True
+nifi_registry_opsgenie_api_key: "{{ server_monitoring_opsgenie_api_key }}"
+nifi_enable_ssl: False
 
-# docker
-docker_pkg_name: docker.io
+nifi_registry_enable_backups: false
+# Certbot
+nifi_registry_certbot_create_certs: false
+nifi_certbot_mail_address: "techops+{{ nifi_registry_server_name }}@ona.io"
+nifi_use_certbot: false
+certbot_site_names:
+  - "{{ nifi_registry_server_name }}"
 
 # nginx
-nifi_registry_basic_auth_file: "{{ canopy_nifi_nginx_basic_auth_file }}"
-nifi_registry_basic_auth_name: "{{ canopy_nifi_nginx_basic_auth_name }}"
-nifi_registry_password: "{{ canopy_nifi_registry_nginx_basic_auth_pass }}"
+nifi_registry_basic_auth_file: "/etc/nginx/passwdfile"
+nifi_registry_basic_auth_name: "admin"
+nifi_registry_password: "{{ vault_nifi_registry_nginx_basic_auth_pass }}"
 nginx_sites:
-  - server:  # the sole purpose of this is to redirect to https
+  - server: # the sole purpose of this is to redirect to https
       name: nifi-registry-http
       listen:
         - "80"
@@ -51,17 +56,20 @@ nginx_sites:
         cert: "star.ddc-malaria.org.crt"
         key: "star.ddc-malaria.org.key"
         src_dir: "files"
-        conf: "{{ nifi_registry_server_name }}.conf"
+        conf: "{{ nifi_server_name }}-ssl.conf"
+        access_log_format: "timed_combined"
+        remote_src: false
 nginx_enabled_sites:
   - nifi-registry-http
   - nifi-registry
 
+nginx_access_logs:
+  - name: "timed_combined"
+    format: '''$http_x_forwarded_for - $remote_user [$time_local]  "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_time $upstream_response_time $gzip_ratio $request_length'''
+    options: null
+    filename: "{{ nifi_registry_server_name }}-access.log"
 
-canopy_nifi_nginx_basic_auth_file: /etc/nginx/passwdfile
-canopy_nifi_nginx_basic_auth_name: admin
-canopy_nifi_registry_nginx_basic_auth_pass: "{{ vault_canopy_nifi_registry_nginx_basic_auth_pass }}"
-
-# # backup
-# nifi_registry_backup_target: "s3://s3-eu-west-1.amazonaws.com/nifi-registry-backups/nifi-registry.ona.io/{{ ansible_hostname }}"
-# nifi_registry_backup_target_user: "{{ vault_nifi_registry_backup_target_user }}"
-# nifi_registry_backup_target_pass: "{{ vault_nifi_registry_backup_target_pass }}"
+# backup
+nifi_registry_backup_target: ""
+nifi_registry_backup_target_user: ""
+nifi_registry_backup_target_pass: ""
