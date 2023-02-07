@@ -1,8 +1,8 @@
 ---
-name: Training Issue
+name: Capacity Building Issue
 about: Use this to submit issues or bugs that are meant to be a learning opportunity
   for Biophics
-title: "[Training Issue]"
+title: "[Capacity Building Issue]"
 labels: Biophics Action, Capacity Building
 assignees: pongthepm
 
