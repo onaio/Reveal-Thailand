@@ -1,9 +1,10 @@
 ---
-name: 'Issue: Reveal Thailand Support Request'
-about: Use this issue to submit a corrective and adaptive maintenance request.
-title: "[Support Request]:"
-labels: Awaiting Authorization, CHAI Action, Corrective & Adaptive Maintenance Request
-assignees: AngelaKabari
+name: Training Issue
+about: Use this to submit issues or bugs that are meant to be a learning opportunity
+  for Biophics
+title: "[Training Issue]"
+labels: Biophics Action, Capacity Building
+assignees: pongthepm
 
 ---
 
