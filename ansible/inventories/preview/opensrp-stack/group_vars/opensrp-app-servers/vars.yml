@@ -102,6 +102,7 @@ opensrp_cors_allowed_source: "https://preview-mhealth.{{ reveal_site_name }}"
 # sentry configs
 opensrp_sentry_dsn: "{{ vault_opensrp_sentry_dsn }}"
 
+opensrp_sentry_environment: "preview"
 opensrp_sentry_tags:
   release-namespace: "reveal-th-preview"
   release-name: "opensrp-server-web"
