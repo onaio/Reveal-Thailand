@@ -1,0 +1,75 @@
+---
+ansible_user: user01
+
+# Monitoring hostname
+server_monitoring_set_hostname: True
+server_monitoring_hostname_from_ec2_Name_tag: True
+collectd_version: "5.5.*"
+
+# nifi-registry
+nifi_registry_server_name: preview-nifiregistrymhealth.ddc-malaria.org
+nifi_registry_port: 18080
+nifi_registry_uri: "http://localhost:{{ nifi_registry_port }}"
+nifi_registry_opsgenie_api_key: "{{ server_monitoring_opsgenie_api_key }}"
+nifi_enable_ssl: False
+
+nifi_registry_enable_backups: false
+# Certbot
+nifi_registry_certbot_create_certs: false
+nifi_certbot_mail_address: "techops+{{ nifi_registry_server_name }}@ona.io"
+nifi_use_certbot: false
+certbot_site_names:
+  - "{{ nifi_registry_server_name }}"
+
+# nginx
+nifi_registry_basic_auth_file: "/etc/nginx/passwdfile"
+nifi_registry_basic_auth_name: "admin"
+nifi_registry_password: "{{ vault_nifi_registry_nginx_basic_auth_pass }}"
+nginx_sites:
+  - server: # the sole purpose of this is to redirect to https
+      name: nifi-registry-http
+      listen:
+        - "80"
+        - "[::]:80"
+      server_name: "{{ nifi_registry_server_name }}"
+      return: "301 https://{{ nifi_registry_server_name }}$request_uri"
+      ssl:
+        enabled: False
+  - server:
+      name: nifi-registry
+      listen: 443
+      server_name: "{{ nifi_registry_server_name }}"
+      access_log: "/var/log/nginx/{{ nifi_registry_server_name }}.access.log"
+      error_log: "/var/log/nginx/{{ nifi_registry_server_name }}.error.log"
+      location:
+        name: /
+        proxy_pass: "{{ nifi_registry_uri }}"
+        auth_basic: '"authentication required"'
+        auth_basic_user_file: "{{ nifi_registry_basic_auth_file }}"
+        proxy_set_header:
+          - "X-ProxyScheme https"
+          - "X-ProxyHost {{ nifi_registry_server_name }}"
+          - "X-ProxyPort 443"
+          - "X-ProxyContextPath /"
+      ssl:
+        enabled: true
+        cert: "star.ddc-malaria.org.crt"
+        key: "star.ddc-malaria.org.key"
+        src_dir: "files"
+        conf: "{{ nifi_server_name }}-ssl.conf"
+        access_log_format: "timed_combined"
+        remote_src: false
+nginx_enabled_sites:
+  - nifi-registry-http
+  - nifi-registry
+
+nginx_access_logs:
+  - name: "timed_combined"
+    format: '''$http_x_forwarded_for - $remote_user [$time_local]  "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_time $upstream_response_time $gzip_ratio $request_length'''
+    options: null
+    filename: "{{ nifi_registry_server_name }}-access.log"
+
+# backup
+nifi_registry_backup_target: ""
+nifi_registry_backup_target_user: ""
+nifi_registry_backup_target_pass: ""
