@@ -235,9 +235,9 @@ reveal_nginx_large_client_header_buffers: "4 8k"
 reveal_nginx_first_start: true
 
 # certbot
-reveal_use_certbot: true
-reveal_certbot_create_certs: true
-reveal_certbot_renew_certs: true
+reveal_use_certbot: false
+reveal_certbot_create_certs: false
+reveal_certbot_renew_certs: false
 reveal_certbot_install_cert: false
 reveal_certbot_package: "python3-certbot-nginx"
 reveal_certbot_version: "0.40.*"
