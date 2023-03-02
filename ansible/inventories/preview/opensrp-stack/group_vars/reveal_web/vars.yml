@@ -27,6 +27,8 @@ reveal_react_build_cmds:
 reveal_react_app_settings:
   GENERATE_SOURCEMAP: "false"
   SKIP_PREFLIGHT_CHECK: "true"
+  INLINE_RUNTIME_CHUNK: "false"
+  IMAGE_INLINE_SIZE_LIMIT: "0"
   REACT_APP_DOMAIN_NAME: "https://{{ deployed_site_name }}"
   REACT_APP_WEBSITE_NAME: "{{ app_title }}"
   REACT_APP_THEME_COLOR: "000000"
@@ -151,6 +153,11 @@ reveal_express_app_settings:
   EXRESS_LOGS_FILE_PATH: "/tmp/logs/reveal-preview-express-server.log"
   EXPRESS_ALLOW_TOKEN_RENEWAL: "true"
   EXPRESS_MAXIMUM_SESSION_LIFE_TIME: 10800
+  EXPRESS_CONTENT_SECURITY_POLICY_CONFIG: '{
+    "script-src": ["''self''","''unsafe-inline''","''unsafe-eval''","https://cdnjs.cloudflare.com","code.jquery.com"],
+    "img-src": ["''self''","https://github.com","https://*.githubusercontent.com","data:"],
+    "connect-src": ["''self''","{{ superset_url | string }}","{{ keycloak_url | string }}","{{ opensrp_server_url | string }}"]
+    }'
 
 # nginx
 nginx_install_only: true
