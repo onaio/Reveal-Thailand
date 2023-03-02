@@ -198,14 +198,13 @@ reveal_nginx_sites:
       access_log: "{{ reveal_nginx_log_path }}/{{ deployed_site_name }}-ssl-access.log timed_combined"
       error_log: "{{ reveal_nginx_log_path }}/{{ deployed_site_name }}-ssl-error.log"
       ssl:
-        add_ssl_directive: false
         access_log_format: "timed_combined"
         enabled: true
-        remote_src: true
-        create_symlink: true
-        cert: "fullchain.pem"
-        key: "privkey.pem"
-        src_dir: "/etc/letsencrypt/live/{{ deployed_site_name }}"
+        remote_src: false
+        create_symlink: false
+        cert: "{{ reveal_ssl_cert_file }}"
+        key: "{{ reveal_ssl_key_file }}"
+        src_dir: "{{ reveal_ssl_dir }}"
         conf: "{{ deployed_site_name }}.conf"
       # do not cache the service worker
       location1:
@@ -233,9 +232,9 @@ reveal_nginx_large_client_header_buffers: "4 8k"
 reveal_nginx_first_start: true
 
 # certbot
-reveal_use_certbot: true
-reveal_certbot_create_certs: true
-reveal_certbot_renew_certs: true
+reveal_use_certbot: false
+reveal_certbot_create_certs: false
+reveal_certbot_renew_certs: false
 reveal_certbot_install_cert: false
 reveal_certbot_package: "python3-certbot-nginx"
 reveal_certbot_version: "0.40.*"

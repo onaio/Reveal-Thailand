@@ -201,14 +201,13 @@ reveal_nginx_sites:
       access_log: "{{ reveal_nginx_log_path }}/{{ deployed_site_name }}-ssl-access.log timed_combined"
       error_log: "{{ reveal_nginx_log_path }}/{{ deployed_site_name }}-ssl-error.log"
       ssl:
-        add_ssl_directive: false
         access_log_format: "timed_combined"
         enabled: true
-        remote_src: true
-        create_symlink: true
-        cert: "fullchain.pem"
-        key: "privkey.pem"
-        src_dir: "/etc/letsencrypt/live/{{ deployed_site_name }}"
+        remote_src: false
+        create_symlink: false
+        cert: "{{ reveal_ssl_cert_file }}"
+        key: "{{ reveal_ssl_key_file }}"
+        src_dir: "{{ reveal_ssl_dir }}"
         conf: "{{ deployed_site_name }}.conf"
       # do not cache the service worker
       location1:
