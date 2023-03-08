@@ -20,10 +20,9 @@ keycloak_realm: "reveal-thailand-production"
 superset_url: "https://supersetmhealth.ddc.moph.go.th"
 
 # reveal-web
+reveal_react_remote_js_build: false
 reveal_map_disabled_plan_types: "Dynamic-FI"
 reveal_enabled_plan_types: "Dynamic-FI"
-reveal_navbar_brand_img_src: "https://github.com/onaio/reveal-frontend/raw/master/src/assets/images/thai-logo.png"
-react_remote_js_build: false
 # react
 reveal_react_system_user: "revealweb"
 reveal_react_system_user_home: "/home/{{ reveal_react_system_user }}"
@@ -32,9 +31,15 @@ reveal_react_public_dir: "{{ reveal_react_codebase_path }}/build"
 reveal_react_git_url: "https://github.com/onaio/reveal-frontend.git"
 reveal_react_git_version: "v1.9.6"
 reveal_react_git_key:
+reveal_react_node_version: "16.x"
+reveal_react_build_cmds:
+  - cmd: build
+    path: "{{ react_local_app_path }}"
 reveal_react_app_settings:
   GENERATE_SOURCEMAP: 'false'
   SKIP_PREFLIGHT_CHECK: 'true'
+  INLINE_RUNTIME_CHUNK: "false"
+  IMAGE_INLINE_SIZE_LIMIT: "0"
   REACT_APP_DOMAIN_NAME: "https://{{ deployed_site_name }}"
   REACT_APP_WEBSITE_NAME: "{{ app_title }}"
   REACT_APP_THEME_COLOR: "000000"
@@ -84,8 +89,8 @@ reveal_react_app_settings:
   REACT_APP_OPENSRP_LOGOUT_URL: '{{ opensrp_server_url }}/opensrp/logout.do'
   REACT_APP_DISPLAYED_PLAN_TYPES: "FI,Dynamic-FI"
   REACT_APP_PLAN_TYPES_ALLOWED_TO_CREATE: "Dynamic-FI"
-  REACT_APP_NAVBAR_BRAND_IMG_SRC: "{{ reveal_navbar_brand_img_src }}"
-  REACT_APP_REVEAL_BRAND_IMG_SRC: https://github.com/onaio/reveal-frontend/raw/master/src/assets/images/logo-small.png
+  REACT_APP_NAVBAR_BRAND_IMG_SRC: "https://github.com/onaio/reveal-frontend/raw/{{reveal_react_git_version}}/src/assets/images/thai-logo.png"
+  REACT_APP_REVEAL_BRAND_IMG_SRC: "https://github.com/onaio/reveal-frontend/raw/{{reveal_react_git_version}}/src/assets/images/logo-small.png"
   REACT_APP_SHOW_MDA_SCHOOL_REPORT_LABEL: "false"
   REACT_APP_ENABLE_JURISDICTION_METADATA_UPLOAD: "false"
   REACT_APP_ENABLE_CONFIG_FORM: "true"
@@ -155,6 +160,11 @@ reveal_express_app_settings:
   EXRESS_LOGS_FILE_PATH: "/tmp/logs/reveal-express-server.log"
   EXPRESS_ALLOW_TOKEN_RENEWAL: "true"
   EXPRESS_MAXIMUM_SESSION_LIFE_TIME: 10800
+  EXPRESS_CONTENT_SECURITY_POLICY_CONFIG: '{
+    "script-src": ["''self''","''unsafe-inline''","''unsafe-eval''","https://cdnjs.cloudflare.com","code.jquery.com"],
+    "img-src": ["''self''","https://github.com","https://*.githubusercontent.com","data:"],
+    "connect-src": ["''self''","{{ superset_url | string }}","{{ keycloak_url | string }}","{{ opensrp_server_url | string }}"]
+    }'
 
 # nginx
 nginx_install_only: true
@@ -194,14 +204,13 @@ reveal_nginx_sites:
       access_log: "{{ reveal_nginx_log_path }}/{{ deployed_site_name }}-ssl-access.log timed_combined"
       error_log: "{{ reveal_nginx_log_path }}/{{ deployed_site_name }}-ssl-error.log"
       ssl:
-        add_ssl_directive: false
         access_log_format: "timed_combined"
         enabled: true
-        remote_src: true
-        create_symlink: true
-        cert: "fullchain.pem"
-        key: "privkey.pem"
-        src_dir: "/etc/letsencrypt/live/{{ deployed_site_name }}"
+        remote_src: false
+        create_symlink: false
+        cert: "{{ reveal_ssl_cert_file }}"
+        key: "{{ reveal_ssl_key_file }}"
+        src_dir: "{{ reveal_ssl_dir }}"
         conf: "{{ deployed_site_name }}.conf"
       # do not cache the service worker
       location1:
@@ -229,9 +238,9 @@ reveal_nginx_large_client_header_buffers: "4 8k"
 reveal_nginx_first_start: true
 
 # certbot
-reveal_use_certbot: true
-reveal_certbot_create_certs: true
-reveal_certbot_renew_certs: true
+reveal_use_certbot: false
+reveal_certbot_create_certs: false
+reveal_certbot_renew_certs: false
 reveal_certbot_install_cert: false
 reveal_certbot_package: "python3-certbot-nginx"
 reveal_certbot_version: "0.40.*"
